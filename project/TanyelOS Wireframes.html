@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>TanyelOS — Wireframes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Architects+Daughter&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #f0eee9; font-family: 'Architects Daughter', cursive; }
+  * { box-sizing: border-box; }
+
+  /* ───── wireframe primitives ───── */
+  .wf {
+    --ink: #1d1a16;
+    --ink-soft: #4a4640;
+    --paper: #fbf9f4;
+    --accent: #d2553a;
+    --accent-soft: #f3c8b8;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Architects Daughter', cursive;
+    width: 100%; height: 100%;
+    position: relative;
+    overflow: hidden;
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+  }
+  .wf .stroke { border: 1.5px solid var(--ink); }
+  .wf .stroke-2 { border: 2px solid var(--ink); }
+  .wf .dashed { border-style: dashed; }
+  .wf .soft { color: var(--ink-soft); }
+  .wf .accent { color: var(--accent); }
+  .wf .accent-bg { background: var(--accent-soft); }
+  .wf .hand { font-family: 'Caveat', cursive; }
+
+  /* sketchy hatched fill */
+  .hatch {
+    background-image: repeating-linear-gradient(45deg, transparent 0 4px, rgba(29,26,22,0.18) 4px 5px);
+  }
+  .hatch-dense {
+    background-image: repeating-linear-gradient(45deg, transparent 0 2px, rgba(29,26,22,0.25) 2px 3px);
+  }
+  .hatch-accent {
+    background-image: repeating-linear-gradient(45deg, transparent 0 4px, rgba(210,85,58,0.35) 4px 5px);
+  }
+
+  /* placeholder image: X across a box */
+  .ph {
+    position: relative;
+    background: #fff;
+    border: 1.5px solid var(--ink);
+  }
+  .ph::before, .ph::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to top right, transparent calc(50% - 1px), var(--ink) 50%, transparent calc(50% + 1px));
+  }
+  .ph::after {
+    background: linear-gradient(to top left, transparent calc(50% - 1px), var(--ink) 50%, transparent calc(50% + 1px));
+  }
+
+  .icon-box {
+    width: 56px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    text-align: center;
+    cursor: default;
+  }
+  .icon-box .glyph {
+    width: 44px; height: 44px; border: 1.5px solid var(--ink); background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Caveat'; font-size: 20px;
+  }
+  .icon-box .lbl {
+    font-size: 11px; line-height: 1.1; color: var(--ink);
+  }
+
+  .win {
+    position: absolute;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    box-shadow: 4px 4px 0 0 rgba(29,26,22,0.18);
+    display: flex; flex-direction: column;
+  }
+  .win .titlebar {
+    border-bottom: 1.5px solid var(--ink);
+    padding: 6px 10px;
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Caveat'; font-size: 16px;
+  }
+  .win .dots { display: flex; gap: 6px; }
+  .win .dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 1.5px solid var(--ink); background: #fff;
+    display: inline-block;
+  }
+  .win .body { flex: 1; padding: 10px; overflow: hidden; }
+
+  .annot {
+    position: absolute;
+    font-family: 'Caveat', cursive;
+    font-size: 15px;
+    color: var(--accent);
+    line-height: 1.05;
+  }
+  .annot::before {
+    content: '';
+    display: inline-block;
+  }
+  .arrow {
+    position: absolute;
+    pointer-events: none;
+  }
+  .arrow svg { overflow: visible; }
+
+  /* dock styles */
+  .dock-floating {
+    position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
+    background: var(--paper); border: 1.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 6px 10px;
+    display: flex; gap: 8px; align-items: center;
+    box-shadow: 3px 3px 0 0 rgba(29,26,22,0.18);
+  }
+  .dock-floating .d {
+    width: 32px; height: 32px; border: 1.5px solid var(--ink); background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Caveat'; font-size: 14px;
+    border-radius: 6px;
+  }
+  .dock-floating .d.active { background: var(--accent-soft); }
+  .dock-floating .sep { width: 1px; height: 22px; background: var(--ink); opacity: 0.4; }
+
+  .topbar {
+    position: absolute; left: 0; right: 0; top: 0; height: 22px;
+    border-bottom: 1.5px solid var(--ink);
+    display: flex; align-items: center; padding: 0 10px;
+    font-family: 'Caveat'; font-size: 13px;
+    background: var(--paper);
+    gap: 14px;
+  }
+  .topbar .right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+
+  /* boot wireframe */
+  .scanline {
+    background-image: repeating-linear-gradient(0deg, transparent 0 3px, rgba(29,26,22,0.05) 3px 4px);
+  }
+
+  /* context menu */
+  .ctx {
+    position: absolute;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    box-shadow: 3px 3px 0 0 rgba(29,26,22,0.18);
+    width: 170px;
+    font-family: 'Caveat'; font-size: 15px;
+  }
+  .ctx .item { padding: 5px 12px; border-bottom: 1px dashed rgba(29,26,22,0.35); }
+  .ctx .item:last-child { border-bottom: none; }
+  .ctx .sep { height: 1px; background: rgba(29,26,22,0.4); margin: 0; }
+
+  /* start menu */
+  .startmenu {
+    position: absolute;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    box-shadow: 3px 3px 0 0 rgba(29,26,22,0.18);
+    padding: 12px;
+  }
+
+  /* notes column */
+  .notes {
+    font-family: 'Caveat', cursive;
+    color: #2a251f;
+    line-height: 1.35;
+  }
+  .notes h4 {
+    font-size: 22px; margin: 0 0 6px 0; color: var(--accent);
+  }
+  .notes ul { margin: 0; padding-left: 18px; font-size: 16px; }
+  .notes li { margin-bottom: 4px; }
+  .notes p { font-size: 16px; margin: 0 0 8px 0; }
+
+  /* tabs / tab control above artboards in fullscreen */
+  .legend {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-family: 'Caveat'; font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .legend .swatch {
+    width: 14px; height: 14px; border: 1.5px solid var(--ink);
+    display: inline-block; vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<script type="text/babel">
+const { DesignCanvas, DCSection, DCArtboard, DCPostIt } = window;
+
+// ─────────── Shared bits ───────────
+const Icon = ({ glyph, label, selected, x, y }) => (
+  <div className="icon-box" style={{ position:'absolute', left:x, top:y, ...(selected ? { background:'rgba(210,85,58,0.18)', outline:'1.5px dashed #d2553a', borderRadius:4, padding:2 } : {}) }}>
+    <div className="glyph">{glyph}</div>
+    <div className="lbl">{label}</div>
+  </div>
+);
+
+const Win = ({ x, y, w, h, title, dots=3, children, z, focused }) => (
+  <div className="win" style={{ left:x, top:y, width:w, height:h, zIndex:z, ...(focused ? { boxShadow:'5px 5px 0 0 rgba(210,85,58,0.45)' } : {}) }}>
+    <div className="titlebar">
+      <div className="dots">{Array.from({length:dots}).map((_,i)=><span key={i}/>)}</div>
+      <span style={{flex:1}}>{title}</span>
+      <span style={{fontSize:14, color:'#777'}}>▢ ▭ ✕</span>
+    </div>
+    <div className="body">{children}</div>
+  </div>
+);
+
+// ─────────── A · BOOT SEQUENCE ───────────
+const Boot = () => (
+  <div className="wf scanline" style={{ background:'#0e0d0b', color:'#e8e3d6', fontFamily:"'JetBrains Mono', monospace", padding:18, fontSize:11, lineHeight:1.5 }}>
+    <div style={{ opacity:0.85 }}>
+      <div>[  OK  ] Reached target Basic System.</div>
+      <div>[  OK  ] Started TanyelOS Core 1.0</div>
+      <div>[  OK  ] Mounted /home/tanyel</div>
+      <div>[  OK  ] Started Window Manager</div>
+      <div>[  ..  ] Loading user session<span className="hand" style={{color:'#d2553a'}}> ▎</span></div>
+    </div>
+    <div style={{ position:'absolute', left:0, right:0, bottom:60, textAlign:'center' }}>
+      <div className="hand" style={{ fontSize:38, color:'#fbf9f4', letterSpacing:'0.04em' }}>TanyelOS</div>
+      <div style={{ fontSize:10, color:'#9a9285', marginTop:4 }}>v 1.0  ·  by Tanyel</div>
+      <div style={{ width:160, height:6, border:'1.5px solid #e8e3d6', margin:'14px auto 0', position:'relative' }}>
+        <div style={{ position:'absolute', left:0, top:0, bottom:0, width:'62%', background:'#d2553a' }}/>
+      </div>
+    </div>
+    <div className="annot" style={{ left:14, bottom:8, color:'#d2553a', fontSize:13 }}>↑ scrolling kernel-style log</div>
+  </div>
+);
+
+// ─────────── B · DESKTOP — floating dock ───────────
+const DesktopFloating = () => (
+  <div className="wf">
+    <div className="topbar">
+      <span className="hand">●  TanyelOS</span>
+      <span className="soft">File · Edit · View · Help</span>
+      <div className="right"><span>WiFi</span><span>🔋</span><span>3:14 PM</span></div>
+    </div>
+
+    {/* desktop icons */}
+    <Icon x={20} y={40} glyph="📁" label="Projects" />
+    <Icon x={20} y={120} glyph="📄" label="resume.pdf" selected />
+    <Icon x={20} y={200} glyph="✉" label="Contact" />
+    <Icon x={20} y={280} glyph="◖" label="About me" />
+    <Icon x={20} y={360} glyph=">_" label="Terminal" />
+
+    {/* selection box ghost */}
+    <div className="dashed stroke" style={{ position:'absolute', left:90, top:130, width:140, height:90, background:'rgba(210,85,58,0.08)' }}/>
+
+    {/* a window */}
+    <Win x={150} y={70} w={300} h={210} title="About — README.md" focused>
+      <div className="hand" style={{fontSize:18, marginBottom:6}}>Hi, I'm Tanyel ✦</div>
+      <div style={{height:2, background:'#1d1a16', width:60, marginBottom:8}}/>
+      <div style={{height:8, background:'#eee5d8', marginBottom:5}}/>
+      <div style={{height:8, background:'#eee5d8', marginBottom:5, width:'88%'}}/>
+      <div style={{height:8, background:'#eee5d8', marginBottom:5, width:'72%'}}/>
+      <div style={{height:8, background:'#eee5d8', marginBottom:14, width:'40%'}}/>
+      <div className="ph" style={{height:60}}/>
+    </Win>
+
+    {/* floating dock */}
+    <div className="dock-floating">
+      <div className="d active">◖</div>
+      <div className="d">📁</div>
+      <div className="d">&gt;_</div>
+      <div className="d">✉</div>
+      <div className="d">⚙</div>
+      <div className="sep"/>
+      <div className="d hatch">▢</div>
+    </div>
+
+    {/* annotations */}
+    <div className="annot" style={{ left:84, top:120, width:100 }}>← double-click → opens in window</div>
+    <div className="annot" style={{ left:460, top:120 }}>focused window<br/>has soft shadow</div>
+    <div className="annot" style={{ left:160, bottom:60, transform:'rotate(-2deg)' }}>floating dock<br/>(active app glows)</div>
+    <svg className="arrow" style={{ left:80, top:126, width:12, height:12 }}><path d="M0,6 L10,6" stroke="#d2553a" strokeWidth="1.5" fill="none" markerEnd="url(#a1)"/><defs><marker id="a1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#d2553a"/></marker></defs></svg>
+  </div>
+);
+
+// ─────────── C · DESKTOP — left rail + top bar ───────────
+const DesktopRail = () => (
+  <div className="wf">
+    {/* left rail */}
+    <div style={{ position:'absolute', left:0, top:0, bottom:0, width:54, borderRight:'1.5px solid #1d1a16', background:'#f5f1e8', display:'flex', flexDirection:'column', alignItems:'center', paddingTop:10, gap:10 }}>
+      <div style={{ width:32, height:32, border:'1.5px solid #1d1a16', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'#d2553a', color:'#fbf9f4', fontFamily:'Caveat' }}>T</div>
+      <div style={{ width:24, height:1, background:'#1d1a16', opacity:0.4 }}/>
+      <div className="d" style={{ width:32, height:32, border:'1.5px solid #1d1a16', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'#fbf9f4', fontFamily:'Caveat' }}>◖</div>
+      <div style={{ width:32, height:32, border:'1.5px solid #1d1a16', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'#f3c8b8', fontFamily:'Caveat' }}>📁</div>
+      <div style={{ width:32, height:32, border:'1.5px solid #1d1a16', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'#fbf9f4', fontFamily:'Caveat' }}>&gt;_</div>
+      <div style={{ width:32, height:32, border:'1.5px solid #1d1a16', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'#fbf9f4', fontFamily:'Caveat' }}>✉</div>
+    </div>
+
+    {/* top bar */}
+    <div style={{ position:'absolute', left:54, right:0, top:0, height:24, borderBottom:'1.5px solid #1d1a16', display:'flex', alignItems:'center', padding:'0 10px', gap:14, fontFamily:'Caveat', fontSize:13 }}>
+      <span>Files</span><span className="soft">— ~/Projects</span>
+      <span style={{marginLeft:'auto'}}>WiFi · 🔋 · 3:14</span>
+    </div>
+
+    {/* desktop icons grid */}
+    <div style={{ position:'absolute', left:74, top:40 }}>
+      <Icon x={0} y={0} glyph="📁" label="Projects" />
+      <Icon x={70} y={0} glyph="📄" label="resume" selected />
+      <Icon x={140} y={0} glyph="◖" label="About" />
+    </div>
+
+    {/* file explorer window */}
+    <Win x={140} y={100} w={310} h={180} title="Files — ~/Projects" focused>
+      <div style={{ display:'flex', gap:6, fontFamily:'Caveat', fontSize:13, marginBottom:8 }}>
+        <span className="stroke" style={{padding:'1px 6px'}}>‹</span>
+        <span className="stroke" style={{padding:'1px 6px'}}>›</span>
+        <span className="stroke accent-bg" style={{padding:'1px 8px', flex:1}}>~ / Projects /</span>
+      </div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:8 }}>
+        {['portfolio.md','synth-lab','tanyel-os','dribbles','sketches','old/'].map(f => (
+          <div key={f} style={{ textAlign:'center', fontSize:10 }}>
+            <div className="ph" style={{ width:'100%', aspectRatio:'1', marginBottom:2 }}/>
+            <div style={{ fontFamily:'Architects Daughter' }}>{f}</div>
+          </div>
+        ))}
+      </div>
+    </Win>
+
+    <div className="annot" style={{ left:60, top:230, width:90 }}>← left rail<br/>= dock + start</div>
+    <div className="annot" style={{ left:460, top:130, width:100 }}>breadcrumbs<br/>are clickable →</div>
+  </div>
+);
+
+// ─────────── D · DESKTOP — start menu open + context menu ───────────
+const DesktopStart = () => (
+  <div className="wf">
+    <div className="topbar">
+      <span className="hand accent">⊞ Start</span>
+      <span className="soft">|</span>
+      <span className="soft">3 windows open</span>
+      <div className="right"><span>WiFi</span><span>3:14</span></div>
+    </div>
+
+    {/* desktop icons */}
+    <Icon x={20} y={40} glyph="📁" label="Projects" />
+    <Icon x={20} y={120} glyph="📄" label="resume.pdf" />
+    <Icon x={90} y={40} glyph="◖" label="About" />
+    <Icon x={90} y={120} glyph=">_" label="Terminal" />
+
+    {/* context menu (right click on desktop) */}
+    <div className="ctx" style={{ left:200, top:60 }}>
+      <div className="item">↻  Refresh</div>
+      <div className="item">🖼  Change wallpaper</div>
+      <div className="item">◐  Toggle theme</div>
+      <div className="item soft">📄  New folder</div>
+      <div className="item soft">↕  Sort icons</div>
+      <div className="item soft">&gt;_  Open terminal here</div>
+    </div>
+
+    {/* start menu */}
+    <div className="startmenu" style={{ left:8, bottom:38, width:230, height:230 }}>
+      <div className="hand" style={{ fontSize:18, marginBottom:8, color:'#d2553a' }}>Tanyel ◍</div>
+      <div className="dashed stroke" style={{ padding:'4px 8px', fontFamily:'Caveat', fontSize:13, marginBottom:10 }}>🔍  search apps & files…</div>
+      <div className="hand soft" style={{ fontSize:13, marginBottom:4 }}>Pinned</div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:6, marginBottom:10 }}>
+        {['◖ About','📁 Files','>_ Term','📄 Resume','✉ Mail','⚙ Set'].map(x=>(
+          <div key={x} className="stroke" style={{ padding:'5px 4px', textAlign:'center', fontSize:10, background:'#fff' }}>{x}</div>
+        ))}
+      </div>
+      <div className="hand soft" style={{ fontSize:13, marginBottom:4 }}>Recent</div>
+      <div style={{ fontSize:11, lineHeight:1.5 }}>
+        <div>· resume.pdf</div>
+        <div>· portfolio/case-01</div>
+      </div>
+      <div style={{ position:'absolute', left:0, right:0, bottom:0, borderTop:'1.5px dashed #1d1a16', padding:'4px 10px', fontSize:11, display:'flex', justifyContent:'space-between' }}>
+        <span>⏻ Power</span><span>⚙ Settings</span>
+      </div>
+    </div>
+
+    {/* taskbar */}
+    <div style={{ position:'absolute', left:0, right:0, bottom:0, height:32, borderTop:'1.5px solid #1d1a16', background:'#f5f1e8', display:'flex', alignItems:'center', padding:'0 8px', gap:6, fontFamily:'Caveat', fontSize:13 }}>
+      <div className="stroke accent-bg" style={{ padding:'2px 8px' }}>⊞</div>
+      <div className="stroke" style={{ padding:'2px 8px', background:'#fff' }}>◖ About</div>
+      <div className="stroke" style={{ padding:'2px 8px', background:'#fff', borderBottom:'3px solid #d2553a' }}>📁 Files</div>
+      <div className="stroke" style={{ padding:'2px 8px', background:'#fff', opacity:0.55 }}>&gt;_ Term  (min)</div>
+      <div style={{marginLeft:'auto', fontSize:11}}>WiFi · 🔋 · 3:14 PM</div>
+    </div>
+
+    <div className="annot" style={{ left:248, top:50, transform:'rotate(2deg)' }}>← right-click<br/>desktop</div>
+    <div className="annot" style={{ left:240, bottom:80, transform:'rotate(-1deg)' }}>↙ start menu<br/>= app launcher</div>
+    <div className="annot" style={{ left:170, bottom:5, color:'#d2553a' }}>active app underlined</div>
+  </div>
+);
+
+// ─────────── E · TERMINAL focus ───────────
+const TerminalView = () => (
+  <div className="wf" style={{ background:'#15140f' }}>
+    <div className="topbar" style={{ background:'#15140f', color:'#e8e3d6', borderBottom:'1.5px solid #4a4640' }}>
+      <span className="hand">●  TanyelOS</span>
+      <div className="right"><span>3:14</span></div>
+    </div>
+    <Win x={26} y={36} w={420} h={300} title="tanyel@tanyel-os: ~" focused>
+      <div style={{ background:'#15140f', color:'#e8e3d6', fontFamily:"'JetBrains Mono', monospace", fontSize:11, padding:8, height:'100%', lineHeight:1.5 }}>
+        <div><span style={{color:'#d2553a'}}>tanyel@tanyel-os</span>:<span style={{color:'#7aa0c4'}}>~</span>$ neofetch</div>
+        <div style={{ display:'flex', gap:14, marginTop:4 }}>
+          <pre style={{ margin:0, color:'#d2553a', fontSize:9, lineHeight:1.1 }}>{`  ████████  
+ ██      ██ 
+██   T    ██
+██   OS   ██
+ ██      ██ 
+  ████████  `}</pre>
+          <div style={{ fontSize:10 }}>
+            <div><span style={{color:'#d2553a'}}>tanyel</span>@tanyel-os</div>
+            <div>------------------</div>
+            <div><b>OS:</b> TanyelOS 1.0</div>
+            <div><b>Shell:</b> tsh 0.1</div>
+            <div><b>Theme:</b> Paper-Light</div>
+            <div><b>Uptime:</b> 3 mins</div>
+          </div>
+        </div>
+        <div style={{ marginTop:8 }}><span style={{color:'#d2553a'}}>$</span> ls</div>
+        <div>about.md   projects/   resume.pdf   contact   .config</div>
+        <div><span style={{color:'#d2553a'}}>$</span> <span className="hand" style={{color:'#fbf9f4', fontSize:14}}>▎</span></div>
+      </div>
+    </Win>
+    <div className="annot" style={{ left:30, bottom:30, color:'#d2553a' }}>commands: ls cd pwd cat mkdir touch rm rmdir echo clear neofetch whoami date ps help</div>
+  </div>
+);
+
+// ─────────── F · FILE EXPLORER focus ───────────
+const FilesView = () => (
+  <div className="wf" style={{ background:'#e8e3d6' }}>
+    <div className="topbar"><span className="hand">●  Files</span><div className="right"><span>3:14</span></div></div>
+    <Win x={20} y={36} w={430} h={310} title="Files" focused>
+      <div style={{ display:'flex', gap:6, fontFamily:'Caveat', fontSize:14, marginBottom:8 }}>
+        <span className="stroke" style={{padding:'2px 8px'}}>‹</span>
+        <span className="stroke" style={{padding:'2px 8px'}}>›</span>
+        <span className="stroke" style={{padding:'2px 8px'}}>↑</span>
+        <span className="stroke accent-bg" style={{padding:'2px 8px', flex:1}}>~ / Projects / synth-lab</span>
+        <span className="stroke" style={{padding:'2px 8px'}}>🔍</span>
+      </div>
+      <div style={{ display:'flex', height:220 }}>
+        <div style={{ width:110, borderRight:'1.5px solid #1d1a16', paddingRight:6, fontSize:11 }}>
+          <div className="hand soft" style={{fontSize:13}}>Places</div>
+          <div>◖ Home</div>
+          <div className="accent">📁 Projects</div>
+          <div>📄 Documents</div>
+          <div>🖼 Pictures</div>
+          <div>⌫ Trash</div>
+          <div className="hand soft" style={{fontSize:13, marginTop:8}}>Devices</div>
+          <div>◇ TanyelOS</div>
+        </div>
+        <div style={{ flex:1, paddingLeft:8, display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:10, alignContent:'start' }}>
+          {[
+            ['📁','case-01'],['📁','case-02'],['📁','assets'],['📄','readme.md'],
+            ['🖼','hero.png'],['🖼','wire-01.png'],['📄','notes.txt'],['◐','demo.mp4'],
+          ].map(([g,n], i)=>(
+            <div key={i} style={{ textAlign:'center', fontSize:10, ...(i===4 ? { background:'rgba(210,85,58,0.18)', outline:'1.5px dashed #d2553a' } : {}) }}>
+              <div className="ph" style={{ aspectRatio:'1', marginBottom:2, fontFamily:'Caveat', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, background:'#fff' }}>{g}</div>
+              <div>{n}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ borderTop:'1.5px dashed #1d1a16', marginTop:8, paddingTop:4, fontSize:10, display:'flex', justifyContent:'space-between' }}>
+        <span>1 selected · hero.png</span><span>8 items · 14.2 MB</span>
+      </div>
+    </Win>
+    <div className="annot" style={{ left:32, top:78, width:90 }}>breadcrumbs<br/>↓ clickable</div>
+    <div className="annot" style={{ left:460, top:140 }}>← double-click<br/>opens file in<br/>new window</div>
+  </div>
+);
+
+// ─────────── App ───────────
+const App = () => (
+  <DesignCanvas>
+    <DCSection id="boot" title="01 · Boot & Login" subtitle="Kernel-style log + logo + progress">
+      <DCArtboard id="boot-1" label="A · Boot Sequence" width={500} height={380}>
+        <Boot/>
+      </DCArtboard>
+      <DCPostIt>
+        <b>Boot direction:</b><br/>
+        Terminal-style scrolling log (the user asked for working terminal — establishes that vocabulary up front).<br/><br/>
+        Logo + progress bar settle in lower third. Theme: dark paper.
+      </DCPostIt>
+    </DCSection>
+
+    <DCSection id="desktop" title="02 · Desktop layouts" subtitle="Three structural directions for the OS chrome">
+      <DCArtboard id="dt-1" label="B · Floating dock + top bar" width={500} height={380}>
+        <DesktopFloating/>
+      </DCArtboard>
+      <DCArtboard id="dt-2" label="C · Left rail + top bar" width={500} height={380}>
+        <DesktopRail/>
+      </DCArtboard>
+      <DCArtboard id="dt-3" label="D · Start menu + bottom taskbar" width={500} height={380}>
+        <DesktopStart/>
+      </DCArtboard>
+      <DCPostIt>
+        <b>Pick one to take to hi-fi.</b><br/><br/>
+        B — most modern, dock floats. <br/>
+        C — most "Linux-y", efficient.<br/>
+        D — most familiar (closer to Win/XP), best for showing off start menu + taskbar features explicitly.<br/><br/>
+        Lean: <b>D</b> for the resume site — start menu makes "all sections" obvious.
+      </DCPostIt>
+    </DCSection>
+
+    <DCSection id="apps" title="03 · App windows" subtitle="Two key apps in detail">
+      <DCArtboard id="app-1" label="E · Terminal" width={500} height={380}>
+        <TerminalView/>
+      </DCArtboard>
+      <DCArtboard id="app-2" label="F · File Explorer" width={500} height={380}>
+        <FilesView/>
+      </DCArtboard>
+      <DCPostIt>
+        <b>Terminal commands</b><br/>
+        ls cd pwd cat mkdir touch rm rmdir echo clear neofetch whoami date ps help<br/><br/>
+        <b>File explorer:</b> sidebar (Places / Devices) + breadcrumbs + grid view. Files open in new windows.
+      </DCPostIt>
+    </DCSection>
+  </DesignCanvas>
+);
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
