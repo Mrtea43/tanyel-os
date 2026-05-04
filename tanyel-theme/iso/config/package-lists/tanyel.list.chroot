@@ -1,53 +1,43 @@
-# TanyelOS package list
-# Installed inside the live/installed system via live-build
+# TanyelOS minimal package list
+# Only essentials — keeps build time under 30 minutes
 
-# ── Base GNOME desktop ────────────────────────────────────────
-ubuntu-desktop-minimal
+# ── Kernel + boot ─────────────────────────────────────────────
+linux-image-generic
+linux-firmware
+casper
+lupin-casper
+grub-efi-amd64
+grub-pc-bin
+
+# ── Display server ────────────────────────────────────────────
+xorg
+xserver-xorg
+
+# ── GNOME desktop (minimal) ───────────────────────────────────
 gnome-shell
 gnome-session
+gdm3
+gnome-terminal
+nautilus
 gnome-control-center
 gnome-tweaks
-gnome-shell-extensions
 gnome-shell-extension-manager
-gnome-software
-
-# ── Required apps ─────────────────────────────────────────────
-nautilus
-gnome-terminal
-gedit
-eog
-evince
-file-roller
-gnome-calculator
-gnome-system-monitor
-gnome-disk-utility
 
 # ── Fonts ─────────────────────────────────────────────────────
 fonts-inter
 fonts-jetbrains-mono
+fonts-noto-core
 
-# ── Plymouth (boot animation) ─────────────────────────────────
-plymouth
-plymouth-themes
-plymouth-label
+# ── Network ───────────────────────────────────────────────────
+network-manager
+network-manager-gnome
 
-# ── Display / Wayland ─────────────────────────────────────────
-gdm3
-xwayland
-mesa-utils
-
-# ── System utilities ──────────────────────────────────────────
+# ── Utilities ─────────────────────────────────────────────────
 curl
 wget
-git
 unzip
 dconf-cli
-dconf-editor
+ca-certificates
 
-# ── Firefox (browser) ─────────────────────────────────────────
+# ── Browser ───────────────────────────────────────────────────
 firefox
-
-# ── Installer (Ubiquity / Subiquity for live ISO) ─────────────
-ubiquity
-ubiquity-frontend-gtk
-ubiquity-slideshow-ubuntu
