@@ -38,10 +38,13 @@ fi
 # ── Step 2: Extract ISO ───────────────────────────────────────
 step "Extracting ISO"
 rm -rf "$WORK_DIR"
-mkdir -p "$WORK_DIR/iso" "$WORK_DIR/squashfs" "$WORK_DIR/newfs"
+mkdir -p "$WORK_DIR/iso" "$WORK_DIR/mnt" "$WORK_DIR/newfs"
 
-info "Extracting ISO contents"
-xorriso -osirrox on -indev "$UBUNTU_ISO" -extract / "$WORK_DIR/iso" 2>/dev/null
+info "Mounting ISO"
+mount -o loop,ro "$UBUNTU_ISO" "$WORK_DIR/mnt"
+info "Copying ISO contents"
+cp -a "$WORK_DIR/mnt/." "$WORK_DIR/iso/"
+umount "$WORK_DIR/mnt"
 chmod -R u+w "$WORK_DIR/iso"
 ok "ISO extracted"
 
