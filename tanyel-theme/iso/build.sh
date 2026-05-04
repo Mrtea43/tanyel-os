@@ -47,11 +47,22 @@ ok "ISO extracted"
 
 # ── Step 3: Extract squashfs filesystem ───────────────────────
 step "Extracting filesystem"
-SQUASH_FILE=$(find "$WORK_DIR/iso" -name "*.squashfs" | head -1)
-[[ -z "$SQUASH_FILE" ]] && SQUASH_FILE=$(find "$WORK_DIR/iso" -name "filesystem.squashfs" | head -1)
-[[ -z "$SQUASH_FILE" ]] && fail "Could not find squashfs filesystem in ISO"
 
-info "Extracting $SQUASH_FILE"
+# Debug: show ISO structure so we can find squashfs
+echo "  ISO contents:"
+find "$WORK_DIR/iso" -maxdepth 3 | sed 's/^/    /'
+
+# Ubuntu 24.04 stores squashfs under casper/ with various names
+SQUASH_FILE=$(find "$WORK_DIR/iso" \( \
+  -name "*.squashfs" -o \
+  -name "*.sqfs" -o \
+  -name "minimal.squashfs" -o \
+  -name "filesystem.squashfs" \
+\) | grep -v "README" | sort | tail -1)
+
+[[ -z "$SQUASH_FILE" ]] && fail "Could not find squashfs filesystem in ISO. Check structure above."
+
+info "Using squashfs: $SQUASH_FILE"
 unsquashfs -d "$WORK_DIR/newfs" "$SQUASH_FILE"
 ok "Filesystem extracted"
 
