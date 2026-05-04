@@ -59,7 +59,6 @@ lb config \
   --win32-loader false \
   --apt-indices false \
   --apt-recommends true \
-  --debootstrap-options "--variant=minbase" \
   --mirror-bootstrap "http://archive.ubuntu.com/ubuntu/" \
   --mirror-chroot "http://archive.ubuntu.com/ubuntu/" \
   --mirror-binary "http://archive.ubuntu.com/ubuntu/" \
