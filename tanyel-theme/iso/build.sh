@@ -20,7 +20,7 @@ UBUNTU_ISO="$SCRIPT_DIR/ubuntu-base.iso"
 
 [[ $EUID -ne 0 ]] && fail "Run as root: sudo bash build.sh"
 
-for cmd in xorriso unsquashfs mksquashfs curl; do
+for cmd in xorriso unsquashfs mksquashfs curl 7z; do
   command -v "$cmd" &>/dev/null || fail "Missing: $cmd"
 done
 ok "All tools present"
@@ -38,13 +38,10 @@ fi
 # ── Step 2: Extract ISO ───────────────────────────────────────
 step "Extracting ISO"
 rm -rf "$WORK_DIR"
-mkdir -p "$WORK_DIR/iso" "$WORK_DIR/mnt" "$WORK_DIR/newfs"
+mkdir -p "$WORK_DIR/iso" "$WORK_DIR/newfs"
 
-info "Mounting ISO"
-mount -o loop,ro "$UBUNTU_ISO" "$WORK_DIR/mnt"
-info "Copying ISO contents"
-cp -a "$WORK_DIR/mnt/." "$WORK_DIR/iso/"
-umount "$WORK_DIR/mnt"
+info "Extracting ISO with 7z"
+7z x "$UBUNTU_ISO" -o"$WORK_DIR/iso" -y > /dev/null
 chmod -R u+w "$WORK_DIR/iso"
 ok "ISO extracted"
 
