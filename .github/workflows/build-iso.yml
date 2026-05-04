@@ -19,7 +19,7 @@ jobs:
   build:
     name: Build ISO
     runs-on: ubuntu-22.04
-    timeout-minutes: 90
+    timeout-minutes: 120
 
     permissions:
       contents: write   # needed to create GitHub Releases
