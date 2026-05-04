@@ -1,0 +1,193 @@
+# TanyelOS Plymouth boot theme script
+# Renders: dark bg → TanyelOS logo → progress bar → status text
+# Matches .t-boot from TanyelOS.html
+
+# ── Palette ──────────────────────────────────────────────────
+bg_r = 0.141; bg_g = 0.161; bg_b = 0.204;     # oklch(18% 0.008 250)
+fg_r = 0.961; fg_g = 0.953; fg_b = 0.937;     # oklch(96% 0.005 80)
+dim_r = 0.431; dim_g = 0.408; dim_b = 0.380;  # oklch(58% 0.01 80)
+acc_r = 0.169; acc_g = 0.619; acc_b = 0.659;  # oklch(62% 0.16 195) teal
+
+bar_track_r = 0.133; bar_track_g = 0.149; bar_track_b = 0.188;
+bar_fill_r  = acc_r; bar_fill_g  = acc_g; bar_fill_b  = acc_b;
+
+# ── Screen setup ─────────────────────────────────────────────
+screen_w = Window.GetWidth();
+screen_h = Window.GetHeight();
+cx = screen_w / 2;
+cy = screen_h / 2;
+
+Window.SetBackgroundTopColor   (bg_r, bg_g, bg_b);
+Window.SetBackgroundBottomColor(bg_r, bg_g, bg_b);
+
+# ── Logo box (96×96, rounded via sprite) ─────────────────────
+logo_size = 96;
+logo_x = cx - logo_size / 2;
+logo_y = cy - logo_size / 2 - 40;
+
+logo_bg = SpriteNew();
+logo_bg.image = Image.New(logo_size, logo_size);
+logo_bg.image = logo_bg.image.Scale(logo_size, logo_size);
+logo_bg.SetX(logo_x);
+logo_bg.SetY(logo_y);
+logo_bg.SetZ(1);
+
+# Fill logo box with accent gradient (left=teal, right=blue)
+for (y = 0; y < logo_size; y++)
+{
+  for (x = 0; x < logo_size; x++)
+  {
+    # Rounded rect mask (r=22)
+    r = 22;
+    dx = Math.Min(x, logo_size - 1 - x) - r;
+    dy = Math.Min(y, logo_size - 1 - y) - r;
+    inside = (dx >= 0 || dy >= 0) ? 1 :
+             (dx * dx + dy * dy < r * r) ? 1 : 0;
+
+    t = x / logo_size;
+    pr = acc_r * (1 - t * 0.2);
+    pg = acc_g * (1 - t * 0.1);
+    pb = (acc_b + 0.12 * t);
+
+    logo_bg.image.SetPixel(x, y, pr, pg, pb, inside * 1.0);
+  }
+}
+
+# ── "T" glyph in logo (drawn as white rectangles) ────────────
+glyph = SpriteNew();
+glyph.image = Image.New(logo_size, logo_size);
+glyph.SetX(logo_x);
+glyph.SetY(logo_y);
+glyph.SetZ(2);
+
+# Horizontal bar of T  (y=26..40, x=20..76)
+for (y = 26; y < 40; y++)
+  for (x = 20; x < 76; x++)
+    glyph.image.SetPixel(x, y, 1, 1, 1, 1.0);
+
+# Vertical stem of T   (y=26..76, x=38..58)
+for (y = 26; y < 76; y++)
+  for (x = 38; x < 58; x++)
+    glyph.image.SetPixel(x, y, 1, 1, 1, 1.0);
+
+# ── Name label ───────────────────────────────────────────────
+name_y = logo_y + logo_size + 16;
+name = Image.Text("TanyelOS", fg_r, fg_g, fg_b, 1.0, "Sans Bold 24");
+name_sprite = SpriteNew();
+name_sprite.image = name;
+name_sprite.SetX(cx - name.GetWidth() / 2);
+name_sprite.SetY(name_y);
+name_sprite.SetZ(2);
+
+# Version label
+version_y = name_y + name.GetHeight() + 4;
+ver = Image.Text("version 1.0 · web edition", dim_r, dim_g, dim_b, 1.0, "Sans 11");
+ver_sprite = SpriteNew();
+ver_sprite.image = ver;
+ver_sprite.SetX(cx - ver.GetWidth() / 2);
+ver_sprite.SetY(version_y);
+ver_sprite.SetZ(2);
+
+# ── Progress bar ─────────────────────────────────────────────
+bar_w = 220;
+bar_h = 4;
+bar_x = cx - bar_w / 2;
+bar_y = version_y + ver.GetHeight() + 28;
+
+# Track
+bar_track = SpriteNew();
+bar_track.image = Image.New(bar_w, bar_h);
+for (y = 0; y < bar_h; y++)
+  for (x = 0; x < bar_w; x++)
+    bar_track.image.SetPixel(x, y, bar_track_r, bar_track_g, bar_track_b, 1.0);
+bar_track.SetX(bar_x);
+bar_track.SetY(bar_y);
+bar_track.SetZ(2);
+
+# Fill (updated in progress callback)
+bar_fill = SpriteNew();
+bar_fill.image = Image.New(1, bar_h);
+bar_fill.SetX(bar_x);
+bar_fill.SetY(bar_y);
+bar_fill.SetZ(3);
+fill_w = 0;
+
+fun update_bar(progress)
+{
+  new_w = Math.Int(bar_w * progress);
+  if (new_w < 1) new_w = 1;
+  if (new_w == fill_w) return;
+  fill_w = new_w;
+  bar_fill.image = Image.New(fill_w, bar_h);
+  for (y = 0; y < bar_h; y++)
+    for (x = 0; x < fill_w; x++)
+    {
+      t = x / bar_w;
+      pr = bar_fill_r;
+      pg = bar_fill_g + 0.08 * t;
+      pb = Math.Min(1.0, bar_fill_b + 0.10 * t);
+      bar_fill.image.SetPixel(x, y, pr, pg, pb, 1.0);
+    }
+}
+
+# ── Status text ───────────────────────────────────────────────
+status_y = bar_y + bar_h + 14;
+status_sprite = SpriteNew();
+status_sprite.SetZ(2);
+
+fun update_status(text)
+{
+  if (text == "") text = "Starting…";
+  img = Image.Text(text, dim_r + 0.12, dim_g + 0.10, dim_b + 0.08, 1.0, "Monospace 11");
+  status_sprite.image = img;
+  status_sprite.SetX(cx - img.GetWidth() / 2);
+  status_sprite.SetY(status_y);
+}
+
+update_status("Initializing kernel…");
+
+# ── Callbacks ─────────────────────────────────────────────────
+Plymouth.SetBootProgressFunction(
+  fun (duration, progress)
+  {
+    update_bar(progress);
+  }
+);
+
+Plymouth.SetUpdateStatusFunction(
+  fun (status)
+  {
+    update_status(status);
+  }
+);
+
+Plymouth.SetMessageFunction(
+  fun (text)
+  {
+    update_status(text);
+  }
+);
+
+Plymouth.SetRootMountedFunction(
+  fun ()
+  {
+    update_bar(0.5);
+    update_status("Mounting filesystems…");
+  }
+);
+
+Plymouth.SetDisplayPasswordFunction(
+  fun (prompt, bullets)
+  {
+    update_status(prompt);
+  }
+);
+
+# On quit: fade out (Plymouth handles the transition to GDM/login)
+Plymouth.SetQuitFunction(
+  fun ()
+  {
+    update_bar(1.0);
+    update_status("Welcome.");
+  }
+);

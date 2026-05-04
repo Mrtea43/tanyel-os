@@ -1,0 +1,140 @@
+#!/bin/bash
+# Chroot hook: runs inside the live filesystem during ISO build
+# Bakes in the TanyelOS theme so it's active the moment the ISO boots
+
+set -euo pipefail
+
+echo ">>> TanyelOS: applying theme inside chroot"
+
+# ── 1. Download and install Geist font ───────────────────────
+echo "  → Installing Geist font"
+FONT_DIR="/usr/share/fonts/truetype/geist"
+mkdir -p "$FONT_DIR"
+
+# Download from Vercel's GitHub releases
+curl -fsSL \
+  "https://github.com/vercel/geist-font/releases/latest/download/Geist.zip" \
+  -o /tmp/Geist.zip 2>/dev/null || {
+    echo "  ! Could not download Geist — using Inter as fallback"
+  }
+
+if [[ -f /tmp/Geist.zip ]]; then
+  unzip -q /tmp/Geist.zip -d /tmp/geist-unzip
+  find /tmp/geist-unzip -name "*.ttf" -o -name "*.otf" | xargs -I{} cp {} "$FONT_DIR/"
+  rm -rf /tmp/Geist.zip /tmp/geist-unzip
+fi
+
+fc-cache -f 2>/dev/null || true
+
+# ── 2. Install GNOME Shell extensions ─────────────────────────
+echo "  → Installing GNOME Shell extensions"
+
+EXT_DIR="/usr/share/gnome-shell/extensions"
+mkdir -p "$EXT_DIR"
+
+install_extension() {
+  local uuid="$1"
+  local url="$2"
+  if [[ -d "$EXT_DIR/$uuid" ]]; then
+    echo "    already installed: $uuid"
+    return
+  fi
+  echo "    installing: $uuid"
+  curl -fsSL "$url" -o "/tmp/${uuid}.zip" 2>/dev/null || {
+    echo "    ! failed to download $uuid"
+    return
+  }
+  mkdir -p "$EXT_DIR/$uuid"
+  unzip -q "/tmp/${uuid}.zip" -d "$EXT_DIR/$uuid" || true
+  rm -f "/tmp/${uuid}.zip"
+}
+
+# Dash to Panel — bottom taskbar
+install_extension \
+  "dash-to-panel@jderose9.github.com" \
+  "https://extensions.gnome.org/extension-data/dash-to-paneljderose9.github.com.v64.shell-extension.zip"
+
+# ArcMenu — Start menu
+install_extension \
+  "arcmenu@arcmenu.com" \
+  "https://extensions.gnome.org/extension-data/arcmenuarcmenu.com.v60.shell-extension.zip"
+
+# Blur my Shell — panel/taskbar blur
+install_extension \
+  "blur-my-shell@aunetx" \
+  "https://extensions.gnome.org/extension-data/blur-my-shellaunetx.v66.shell-extension.zip"
+
+# User Themes — load custom shell theme
+install_extension \
+  "user-theme@gnome-shell-extensions.gcampax.github.com" \
+  "https://extensions.gnome.org/extension-data/user-themegnome-shell-extensions.gcampax.github.com.v54.shell-extension.zip"
+
+# Just Perfection — clean up GNOME chrome
+install_extension \
+  "just-perfection-desktop@just-perfection" \
+  "https://extensions.gnome.org/extension-data/just-perfection-desktopjust-perfection.v28.shell-extension.zip"
+
+# ── 3. Set Plymouth theme ─────────────────────────────────────
+echo "  → Setting Plymouth boot theme"
+
+if command -v update-alternatives &>/dev/null; then
+  update-alternatives --install \
+    /usr/share/plymouth/themes/default.plymouth \
+    default.plymouth \
+    /usr/share/plymouth/themes/tanyel/tanyel.plymouth \
+    200 2>/dev/null || true
+fi
+
+if command -v update-initramfs &>/dev/null; then
+  update-initramfs -u 2>/dev/null || true
+fi
+
+# ── 4. Compile dconf system database ─────────────────────────
+echo "  → Compiling dconf system database"
+dconf update 2>/dev/null || true
+
+# ── 5. Set GTK theme in /etc/environment ─────────────────────
+echo "  → Setting system-wide GTK environment"
+cat >> /etc/environment <<'EOF'
+GTK_THEME=TanyelOS
+EOF
+
+# ── 6. Create index.theme for the GTK theme ──────────────────
+cat > /usr/share/themes/TanyelOS/index.theme <<'EOF'
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=TanyelOS
+Comment=TanyelOS desktop theme
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=TanyelOS
+MetacityTheme=TanyelOS
+IconTheme=Yaru-teal-dark
+CursorTheme=Adwaita
+ButtonLayout=close,minimize,maximize:
+EOF
+
+# ── 7. GDM: use TanyelOS shell theme on login screen ─────────
+echo "  → Configuring GDM"
+
+GDM_CONF="/etc/gdm3/greeter.dconf-defaults"
+cat > "$GDM_CONF" <<'EOF'
+[org/gnome/desktop/interface]
+gtk-theme='TanyelOS'
+color-scheme='prefer-dark'
+font-name='Inter 10'
+
+[org/gnome/login-screen]
+disable-user-list=false
+EOF
+
+# ── 8. Installer: set live session username / hostname ────────
+echo "  → Configuring live session"
+if [[ -f /etc/casper.conf ]]; then
+  sed -i 's/^export USERNAME=.*/export USERNAME="tanyel"/'     /etc/casper.conf
+  sed -i 's/^export USERFULLNAME=.*/export USERFULLNAME="TanyelOS Live"/' /etc/casper.conf
+  sed -i 's/^export HOST=.*/export HOST="tanyelos"/'           /etc/casper.conf
+fi
+
+echo ">>> TanyelOS: chroot setup complete"

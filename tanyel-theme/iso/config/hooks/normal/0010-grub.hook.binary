@@ -1,0 +1,86 @@
+#!/bin/bash
+# Binary hook: runs on the HOST machine during ISO assembly
+# Customises GRUB bootloader splash to match TanyelOS aesthetic
+
+set -euo pipefail
+
+echo ">>> TanyelOS: customising GRUB"
+
+GRUB_CFG="binary/boot/grub/grub.cfg"
+GRUB_THEME_DIR="binary/boot/grub/themes/tanyel"
+
+mkdir -p "$GRUB_THEME_DIR"
+
+# ── GRUB theme.txt ────────────────────────────────────────────
+cat > "$GRUB_THEME_DIR/theme.txt" <<'EOF'
+# TanyelOS GRUB theme
+# Minimal dark theme matching TanyelOS boot palette
+
+desktop-color: "#1B1F2A"
+title-color:   "#F5F3EF"
+title-font:    "Sans Regular 16"
+
++ label {
+  left = 50%-150
+  top  = 40%-30
+  width  = 300
+  height = 60
+  text = "TanyelOS"
+  color  = "#F5F3EF"
+  font   = "Sans Bold 32"
+  align  = "center"
+}
+
++ label {
+  left  = 50%-100
+  top   = 40%+40
+  width = 200
+  height = 20
+  text   = "version 1.0"
+  color  = "#948E88"
+  font   = "Sans Regular 11"
+  align  = "center"
+}
+
++ boot_menu {
+  left   = 50%-160
+  top    = 50%+20
+  width  = 320
+  height = 180
+  item_color         = "#C7C2BB"
+  item_font          = "Sans Regular 13"
+  selected_item_color = "#2B9EA8"
+  selected_item_font  = "Sans Bold 13"
+  item_height  = 32
+  item_padding = 12
+  item_spacing = 2
+  scrollbar = false
+}
+
++ progress_bar {
+  id    = "__timeout__"
+  left  = 50%-110
+  top   = 50%+210
+  width = 220
+  height = 4
+  fg_color = "#2B9EA8"
+  bg_color = "#3A3F52"
+  border_color = "#3A3F52"
+  font = "Sans Regular 1"
+  text = ""
+}
+EOF
+
+# ── Patch grub.cfg to load the theme ─────────────────────────
+if [[ -f "$GRUB_CFG" ]]; then
+  # Inject theme and visual settings before the first menuentry
+  sed -i '1s/^/set gfxmode=1920x1080,1280x720,auto\nset gfxpayload=keep\ninsmod gfxterm\ninsmod gfxmenu\ninsmod png\nset theme=\/boot\/grub\/themes\/tanyel\/theme.txt\nexport theme\n\n/' "$GRUB_CFG"
+
+  # Set timeout
+  sed -i 's/^set timeout=.*/set timeout=5/' "$GRUB_CFG"
+
+  # Rename the default boot entry
+  sed -i 's/Ubuntu/TanyelOS/' "$GRUB_CFG"
+fi
+
+echo ">>> TanyelOS: GRUB theme applied"

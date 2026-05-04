@@ -1,0 +1,1045 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>TanyelOS — A desktop built around you</title>
+<meta name="description" content="TanyelOS is a beautiful, fast Linux desktop that gets out of your way. Boot animation, working terminal, file explorer, and full customisation — ready to download."/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & tokens ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0f1117;
+  --bg-1:      #161a24;
+  --bg-2:      #1c2130;
+  --bg-card:   rgba(28, 33, 48, 0.7);
+  --fg:        #f0ede8;
+  --fg-1:      #b8b3ab;
+  --fg-2:      #706b63;
+  --line:      rgba(255,255,255,0.08);
+  --accent:    #2b9ea8;
+  --accent-2:  #1b7a83;
+  --accent-hi: #3bbdc9;
+  --accent-glow: rgba(43,158,168,0.25);
+  --font:      'Inter', system-ui, sans-serif;
+  --mono:      'JetBrains Mono', ui-monospace, monospace;
+  --r:         12px;
+  --r-lg:      20px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* ── Utility ─────────────────────────────────────────────────── */
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(43,158,168,0.12);
+  border: 0.5px solid rgba(43,158,168,0.3);
+  color: var(--accent-hi);
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 5px 12px; border-radius: 999px;
+}
+.tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+/* ── Nav ─────────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 60px;
+  display: flex; align-items: center;
+  background: rgba(15,17,23,0.7);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 0.5px solid var(--line);
+}
+.nav-inner {
+  display: flex; align-items: center; gap: 32px;
+  max-width: 1120px; margin: 0 auto; padding: 0 24px; width: 100%;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 700; font-size: 15px; color: var(--fg);
+}
+.nav-logo-mark {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: linear-gradient(135deg, var(--accent) 0%, #1b6a9a 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 14px; color: white;
+  box-shadow: 0 2px 12px var(--accent-glow);
+}
+.nav-links {
+  display: flex; gap: 28px; margin-left: auto;
+  list-style: none; font-size: 13.5px; color: var(--fg-1);
+}
+.nav-links a:hover { color: var(--fg); }
+.nav-cta {
+  background: var(--accent); color: white;
+  border: none; border-radius: 8px;
+  padding: 8px 18px; font: 600 13px var(--font);
+  cursor: pointer; transition: filter 0.15s;
+  white-space: nowrap;
+}
+.nav-cta:hover { filter: brightness(1.1); }
+
+/* ── Hero ────────────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  position: relative; overflow: hidden;
+}
+
+.hero-aurora {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(43,158,168,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(27,106,154,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 50% 90%, rgba(43,158,168,0.10) 0%, transparent 55%);
+}
+
+/* grid overlay */
+.hero-grid {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.25;
+  background-image:
+    linear-gradient(rgba(43,158,168,0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(43,158,168,0.15) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 70%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 70%);
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 760px; }
+
+.hero-eyebrow { margin-bottom: 24px; }
+
+.hero-title {
+  font-size: clamp(42px, 7vw, 80px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  margin-bottom: 20px;
+}
+
+.hero-title .accent-word {
+  background: linear-gradient(135deg, var(--accent-hi) 0%, var(--accent) 50%, #5b8fff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-sub {
+  font-size: clamp(16px, 2.5vw, 20px);
+  color: var(--fg-1);
+  max-width: 560px;
+  margin: 0 auto 36px;
+  line-height: 1.55;
+}
+
+.hero-actions {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: white;
+  border: none; border-radius: 10px;
+  padding: 13px 24px; font: 600 15px var(--font);
+  cursor: pointer; transition: filter 0.15s, transform 0.15s;
+  box-shadow: 0 0 0 1px rgba(43,158,168,0.4), 0 4px 24px var(--accent-glow);
+}
+.btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.06); color: var(--fg);
+  border: 0.5px solid var(--line); border-radius: 10px;
+  padding: 13px 24px; font: 500 15px var(--font);
+  cursor: pointer; transition: background 0.15s, transform 0.15s;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.1); transform: translateY(-1px); }
+
+.hero-meta {
+  margin-top: 16px;
+  font-size: 12px; color: var(--fg-2);
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+}
+.hero-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--fg-2); }
+
+/* ── OS mockup ───────────────────────────────────────────────── */
+.mockup-wrap {
+  position: relative; z-index: 1;
+  margin-top: 64px;
+  width: 100%; max-width: 960px;
+}
+
+.mockup-glow {
+  position: absolute; inset: -40px; z-index: -1;
+  background: radial-gradient(ellipse 70% 50% at 50% 60%, rgba(43,158,168,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.mockup {
+  background: #1B1F2A;
+  border-radius: var(--r-lg);
+  border: 0.5px solid rgba(255,255,255,0.10);
+  overflow: hidden;
+  box-shadow:
+    0 0 0 0.5px rgba(0,0,0,0.5),
+    0 32px 80px rgba(0,0,0,0.6),
+    0 0 60px rgba(43,158,168,0.08);
+  aspect-ratio: 16/10;
+  display: flex; flex-direction: column;
+}
+
+/* mockup top bar */
+.m-topbar {
+  height: 26px; flex: none;
+  background: rgba(22,26,36,0.9);
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; padding: 0 12px; gap: 14px;
+  font-size: 10px; color: rgba(184,179,171,0.7);
+}
+.m-tb-logo { display: flex; align-items: center; gap: 5px; font-weight: 600; color: rgba(240,237,232,0.9); }
+.m-tb-logo-mark { width: 10px; height: 10px; border-radius: 2px; background: var(--accent); }
+.m-tb-right { margin-left: auto; display: flex; gap: 12px; }
+
+/* mockup desktop area */
+.m-desktop {
+  flex: 1; position: relative;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 30%, rgba(43,158,168,0.20) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 80% 70%, rgba(27,80,140,0.18) 0%, transparent 55%),
+    linear-gradient(180deg, #1B2035 0%, #141822 100%);
+  overflow: hidden;
+}
+
+/* mockup icons */
+.m-icons {
+  position: absolute; top: 8px; left: 8px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.m-icon {
+  width: 44px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 4px 2px; border-radius: 4px;
+}
+.m-icon-g {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: rgba(43,158,168,0.2);
+  border: 0.5px solid rgba(43,158,168,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+}
+.m-icon-l { font-size: 6px; color: rgba(240,237,232,0.8); text-align: center; white-space: nowrap; }
+
+/* mockup window */
+.m-win {
+  position: absolute;
+  background: rgba(28,33,48,0.95);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.m-win-hd {
+  height: 24px; flex: none;
+  background: rgba(22,26,36,0.9);
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; padding: 0 8px; gap: 6px;
+}
+.m-btn { width: 8px; height: 8px; border-radius: 50%; }
+.m-close { background: #E05C4A; }
+.m-min   { background: #D4A843; }
+.m-max   { background: #52B354; }
+.m-win-title { margin-left: auto; margin-right: auto; font-size: 8px; color: rgba(184,179,171,0.6); }
+.m-win-body { flex: 1; }
+
+/* terminal window */
+.m-terminal {
+  top: 12%; left: 14%; width: 52%; height: 58%;
+}
+.m-term-body {
+  background: #0D111B;
+  height: 100%; padding: 8px;
+  font-family: var(--mono); font-size: 6.5px;
+  color: rgba(235,237,233,0.9);
+  line-height: 1.6;
+}
+.m-term-prompt { color: var(--accent); }
+.m-term-dim { color: rgba(148,142,136,0.8); }
+.m-term-green { color: #52B354; }
+
+/* files window */
+.m-files {
+  top: 8%; left: 40%; width: 48%; height: 52%;
+}
+.m-files-tb {
+  height: 22px; background: rgba(18,22,32,0.9);
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; padding: 0 6px; gap: 4px;
+}
+.m-crumb { font-size: 7px; color: rgba(184,179,171,0.7); }
+.m-files-body { display: flex; height: calc(100% - 22px); }
+.m-sidebar { width: 50px; background: rgba(18,22,32,0.5); padding: 4px; }
+.m-side-item { font-size: 6px; color: rgba(148,142,136,0.8); padding: 3px 2px; display: flex; align-items: center; gap: 2px; }
+.m-side-item.active { color: var(--accent-hi); background: rgba(43,158,168,0.15); border-radius: 3px; }
+.m-grid { flex: 1; padding: 6px; display: flex; flex-wrap: wrap; gap: 4px; align-content: start; }
+.m-tile { width: 30px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 5.5px; color: rgba(184,179,171,0.8); }
+.m-tile-icon { font-size: 14px; }
+
+/* mockup taskbar */
+.m-taskbar {
+  height: 30px; flex: none;
+  background: rgba(22,26,36,0.85);
+  border-top: 0.5px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; padding: 0 6px; gap: 4px;
+}
+.m-start {
+  height: 22px; padding: 0 8px;
+  background: rgba(43,158,168,0.15);
+  border: 0.5px solid rgba(43,158,168,0.25);
+  border-radius: 5px;
+  display: flex; align-items: center; gap: 4px;
+  font-size: 8px; font-weight: 600; color: var(--fg);
+}
+.m-start-mark { width: 8px; height: 8px; border-radius: 2px; background: var(--accent); }
+.m-tb-divider { width: 0.5px; height: 16px; background: rgba(255,255,255,0.08); margin: 0 2px; }
+.m-tb-app {
+  height: 22px; padding: 0 6px;
+  border-radius: 5px; display: flex; align-items: center; gap: 3px;
+  font-size: 7px; color: rgba(184,179,171,0.8);
+  position: relative;
+}
+.m-tb-app.active { background: rgba(255,255,255,0.06); color: var(--fg); }
+.m-tb-app.active::after {
+  content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 12px; height: 1.5px; background: var(--accent); border-radius: 2px;
+}
+.m-clock {
+  margin-left: auto; font-size: 7px; color: rgba(184,179,171,0.8); padding: 0 6px;
+  text-align: right; line-height: 1.4; font-variant-numeric: tabular-nums;
+}
+.m-clock .t { color: var(--fg); font-weight: 500; }
+
+/* ── Logos / social proof ────────────────────────────────────── */
+.logos {
+  padding: 60px 0;
+  text-align: center;
+  border-bottom: 0.5px solid var(--line);
+}
+.logos-label { font-size: 12px; color: var(--fg-2); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; margin-bottom: 28px; }
+.logos-row { display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap; }
+.logos-item { font-size: 13px; color: var(--fg-2); font-weight: 600; letter-spacing: 0.02em; }
+
+/* ── Section base ────────────────────────────────────────────── */
+section { padding: 100px 0; }
+
+.section-label { text-align: center; margin-bottom: 16px; }
+.section-title {
+  font-size: clamp(30px, 5vw, 48px);
+  font-weight: 800; letter-spacing: -0.025em;
+  text-align: center; margin-bottom: 14px;
+}
+.section-sub {
+  font-size: 16px; color: var(--fg-1);
+  text-align: center; max-width: 520px;
+  margin: 0 auto 64px; line-height: 1.6;
+}
+
+/* ── Features grid ───────────────────────────────────────────── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.feat-card {
+  background: var(--bg-card);
+  border: 0.5px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 28px;
+  transition: border-color 0.2s, transform 0.2s;
+  position: relative; overflow: hidden;
+}
+.feat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(43,158,168,0.3), transparent);
+  opacity: 0; transition: opacity 0.2s;
+}
+.feat-card:hover { border-color: rgba(43,158,168,0.3); transform: translateY(-2px); }
+.feat-card:hover::before { opacity: 1; }
+
+.feat-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: rgba(43,158,168,0.12);
+  border: 0.5px solid rgba(43,158,168,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 16px;
+}
+.feat-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
+.feat-desc { font-size: 14px; color: var(--fg-1); line-height: 1.6; }
+
+/* ── Large feature ───────────────────────────────────────────── */
+.feat-large {
+  grid-column: 1 / -1;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+  padding: 36px 40px;
+}
+.feat-large-visual {
+  background: var(--bg-2);
+  border: 0.5px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden; aspect-ratio: 4/3;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+
+/* terminal preview in large feat */
+.mini-terminal {
+  background: #0D111B;
+  border-radius: 8px;
+  width: 90%; height: 80%;
+  padding: 12px 14px;
+  font-family: var(--mono); font-size: 11.5px; color: #EBEDE9;
+  line-height: 1.65;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.mt-prompt { color: var(--accent); }
+.mt-dim    { color: #706b63; }
+.mt-green  { color: #52B354; }
+.mt-blue   { color: #5b8fff; }
+.mt-cursor { display: inline-block; width: 8px; height: 14px; background: var(--accent); vertical-align: middle; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* ── Customisation section ───────────────────────────────────── */
+.custom-section {
+  background: var(--bg-1);
+  border-top: 0.5px solid var(--line);
+  border-bottom: 0.5px solid var(--line);
+}
+
+.accents-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 48px; flex-wrap: wrap; }
+.accent-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--line); border-radius: 999px;
+  padding: 7px 14px; font-size: 12.5px; color: var(--fg-1);
+  cursor: pointer; transition: border-color 0.15s, color 0.15s;
+}
+.accent-chip:hover { color: var(--fg); }
+.accent-chip.active { border-color: rgba(43,158,168,0.5); color: var(--fg); }
+.accent-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+.wallpaper-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.wp-thumb {
+  width: 140px; aspect-ratio: 16/10; border-radius: 10px;
+  border: 2px solid transparent; cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  display: flex; align-items: flex-end; padding: 8px;
+}
+.wp-thumb:hover { transform: scale(1.03); }
+.wp-thumb.active { border-color: var(--accent); }
+.wp-thumb-label { font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.8); background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; }
+
+.wp-aurora {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 30%, rgba(43,158,168,0.55) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 80% 70%, rgba(50,80,160,0.5) 0%, transparent 60%),
+    linear-gradient(180deg, #1B2035, #141822);
+}
+.wp-dusk {
+  background: linear-gradient(180deg, #6B3620 0%, #4A2040 60%, #1E1428 100%);
+}
+.wp-grid {
+  background:
+    linear-gradient(rgba(43,158,168,0.18) 1px, transparent 1px) 0 0/24px 24px,
+    linear-gradient(90deg, rgba(43,158,168,0.18) 1px, transparent 1px) 0 0/24px 24px,
+    radial-gradient(ellipse 70% 60% at 50% 30%, #1B2D3A, #141822);
+}
+.wp-topo {
+  background-color: #1E2530;
+  background-image:
+    repeating-radial-gradient(circle at 30% 40%, transparent 0 12px, rgba(43,158,168,0.15) 12px 13px),
+    repeating-radial-gradient(circle at 70% 70%, transparent 0 16px, rgba(43,158,168,0.10) 16px 17px);
+}
+.wp-solid { background: #253040; }
+
+/* ── Requirements ────────────────────────────────────────────── */
+.req-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 700px; margin: 0 auto;
+}
+.req-card {
+  background: var(--bg-card);
+  border: 0.5px solid var(--line);
+  border-radius: var(--r);
+  padding: 24px 28px;
+}
+.req-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-hi); margin-bottom: 14px; }
+.req-row { display: flex; justify-content: space-between; font-size: 13.5px; padding: 6px 0; border-bottom: 0.5px solid var(--line); }
+.req-row:last-child { border-bottom: none; }
+.req-key { color: var(--fg-1); }
+.req-val { font-weight: 500; }
+
+/* ── Download section ────────────────────────────────────────── */
+.download-section { text-align: center; }
+
+.download-box {
+  max-width: 520px; margin: 0 auto;
+  background: var(--bg-card);
+  border: 0.5px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 40px;
+}
+.dl-version { font-size: 13px; color: var(--fg-2); margin-bottom: 6px; }
+.dl-name { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+.dl-size { font-size: 13px; color: var(--fg-2); margin-bottom: 28px; }
+.dl-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%;
+  background: var(--accent); color: white;
+  border: none; border-radius: 10px;
+  padding: 14px 24px; font: 600 15px var(--font);
+  cursor: pointer; transition: filter 0.15s;
+  box-shadow: 0 4px 24px var(--accent-glow);
+  margin-bottom: 12px;
+}
+.dl-btn:hover { filter: brightness(1.1); }
+.dl-btn svg { width: 18px; height: 18px; }
+.dl-sha {
+  font-family: var(--mono); font-size: 11px; color: var(--fg-2);
+  background: rgba(255,255,255,0.04); border-radius: 6px;
+  padding: 6px 10px; margin-top: 14px;
+  word-break: break-all; text-align: left;
+}
+.dl-options { display: flex; gap: 8px; justify-content: center; margin-top: 20px; }
+.dl-opt {
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--line);
+  border-radius: 8px; padding: 8px 14px;
+  font: 500 12.5px var(--font); color: var(--fg-1);
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.dl-opt:hover { background: rgba(255,255,255,0.08); color: var(--fg); }
+
+/* ── VM guide ────────────────────────────────────────────────── */
+.vm-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;
+  margin-top: 48px;
+}
+.vm-card {
+  background: var(--bg-card); border: 0.5px solid var(--line); border-radius: var(--r);
+  padding: 24px;
+}
+.vm-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.vm-badge { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.vm-badge.free { background: rgba(82,179,84,0.15); color: #52B354; }
+.vm-badge.win  { background: rgba(91,143,255,0.15); color: #5b8fff; }
+.vm-steps { list-style: none; counter-reset: vm; }
+.vm-steps li { counter-increment: vm; display: flex; gap: 10px; font-size: 13px; color: var(--fg-1); padding: 5px 0; }
+.vm-steps li::before {
+  content: counter(vm);
+  min-width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(43,158,168,0.15); color: var(--accent-hi);
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+footer {
+  border-top: 0.5px solid var(--line);
+  padding: 48px 0 32px;
+}
+.footer-inner {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 40px; flex-wrap: wrap;
+}
+.footer-brand { max-width: 240px; }
+.footer-brand p { font-size: 13px; color: var(--fg-2); margin-top: 10px; line-height: 1.6; }
+.footer-col h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-2); margin-bottom: 14px; }
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.footer-col li a { font-size: 13.5px; color: var(--fg-1); transition: color 0.15s; }
+.footer-col li a:hover { color: var(--fg); }
+.footer-bottom {
+  margin-top: 40px; padding-top: 24px;
+  border-top: 0.5px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+  font-size: 12.5px; color: var(--fg-2);
+}
+.footer-bottom a { color: var(--fg-2); }
+.footer-bottom a:hover { color: var(--fg); }
+
+/* ── Fade-in on scroll ───────────────────────────────────────── */
+.fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.5s, transform 0.5s; }
+.fade-up.visible { opacity: 1; transform: none; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .feat-large { grid-template-columns: 1fr; }
+  .feat-large-visual { aspect-ratio: 16/9; }
+  .req-grid { grid-template-columns: 1fr; }
+  .footer-inner { flex-direction: column; }
+  .footer-bottom { flex-direction: column; text-align: center; }
+  .m-files { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Nav ───────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-mark">T</div>
+      TanyelOS
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#customise">Customise</a></li>
+      <li><a href="#download">Download</a></li>
+      <li><a href="https://github.com/tanyel/tanyel-os">GitHub</a></li>
+    </ul>
+    <a href="#download" class="nav-cta">Download ISO</a>
+  </div>
+</nav>
+
+<!-- ── Hero ──────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-aurora"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="tag"><span class="tag-dot"></span>Version 1.0 — Now available</span>
+    </div>
+    <h1 class="hero-title">
+      A desktop built<br/>
+      <span class="accent-word">around you.</span>
+    </h1>
+    <p class="hero-sub">
+      TanyelOS is a fast, beautiful Linux desktop that gets out of your way.
+      Based on Ubuntu. Looks nothing like it.
+    </p>
+    <div class="hero-actions">
+      <a href="#download" class="btn-primary">
+        <svg viewBox="0 0 16 16" width="16" fill="currentColor"><path d="M8 1a.75.75 0 0 1 .75.75v7.19l2.72-2.72a.75.75 0 1 1 1.06 1.06L8 11.81 3.47 7.28a.75.75 0 1 1 1.06-1.06L7.25 8.94V1.75A.75.75 0 0 1 8 1ZM1.5 13.25a.75.75 0 0 1 .75-.75h11.5a.75.75 0 0 1 0 1.5H2.25a.75.75 0 0 1-.75-.75Z"/></svg>
+        Download — Free
+      </a>
+      <a href="#features" class="btn-secondary">
+        See what's inside →
+      </a>
+    </div>
+    <div class="hero-meta">
+      <span>Ubuntu 24.04 base</span>
+      <span class="hero-meta-dot"></span>
+      <span>Wayland + GNOME</span>
+      <span class="hero-meta-dot"></span>
+      <span>~2.5 GB ISO</span>
+      <span class="hero-meta-dot"></span>
+      <span>Free forever</span>
+    </div>
+  </div>
+
+  <!-- OS Mockup -->
+  <div class="mockup-wrap fade-up">
+    <div class="mockup-glow"></div>
+    <div class="mockup">
+      <!-- top bar -->
+      <div class="m-topbar">
+        <div class="m-tb-logo"><div class="m-tb-logo-mark"></div>TanyelOS</div>
+        <span>Terminal</span>
+        <span style="color:rgba(184,179,171,0.4)">File · Edit · View · Help</span>
+        <div class="m-tb-right">
+          <span>⌘</span><span>📶</span><span>🔋</span><span>10:42</span>
+        </div>
+      </div>
+
+      <!-- desktop -->
+      <div class="m-desktop">
+        <!-- icons -->
+        <div class="m-icons">
+          <div class="m-icon"><div class="m-icon-g">◖</div><div class="m-icon-l">About</div></div>
+          <div class="m-icon"><div class="m-icon-g">◇</div><div class="m-icon-l">Projects</div></div>
+          <div class="m-icon"><div class="m-icon-g">📁</div><div class="m-icon-l">Files</div></div>
+          <div class="m-icon"><div class="m-icon-g" style="font-size:9px;font-family:monospace">&gt;_</div><div class="m-icon-l">Terminal</div></div>
+        </div>
+
+        <!-- terminal window -->
+        <div class="m-win m-terminal">
+          <div class="m-win-hd">
+            <div class="m-btn m-close"></div>
+            <div class="m-btn m-min"></div>
+            <div class="m-btn m-max"></div>
+            <div class="m-win-title">&gt;_ Terminal</div>
+          </div>
+          <div class="m-win-body m-term-body">
+            <div><span class="m-term-dim">TanyelOS terminal · type `help` for commands</span></div>
+            <div>&nbsp;</div>
+            <div><span class="m-term-prompt">tanyel@tanyel-os:~$</span> neofetch</div>
+            <div><span class="m-term-dim">   ▄▄▄▄▄▄▄    tanyel@tanyel-os</span></div>
+            <div><span class="m-term-dim"> ▄█████████▄  ----------------</span></div>
+            <div><span class="m-term-dim">████ TOS ████ OS: TanyelOS 1.0</span></div>
+            <div><span class="m-term-dim"> ▀█████████▀  Shell: tsh 0.1</span></div>
+            <div><span class="m-term-dim">   ▀▀▀▀▀▀▀    Theme: dark</span></div>
+            <div>&nbsp;</div>
+            <div><span class="m-term-prompt">tanyel@tanyel-os:~$</span> ls projects/</div>
+            <div><span class="m-term-green">synth-lab/</span>  <span class="m-term-green">tanyel-os/</span>  <span class="m-term-green">paper-ui/</span>  <span class="m-term-green">fieldnotes/</span></div>
+            <div>&nbsp;</div>
+            <div><span class="m-term-prompt">tanyel@tanyel-os:~$</span> <span style="opacity:0.5">▌</span></div>
+          </div>
+        </div>
+
+        <!-- files window -->
+        <div class="m-win m-files">
+          <div class="m-win-hd">
+            <div class="m-btn m-close"></div>
+            <div class="m-btn m-min"></div>
+            <div class="m-btn m-max"></div>
+            <div class="m-win-title">📁 Files</div>
+          </div>
+          <div class="m-files-tb">
+            <span class="m-crumb">~ / projects</span>
+          </div>
+          <div class="m-files-body">
+            <div class="m-sidebar">
+              <div class="m-side-item active"><span>◖</span>Home</div>
+              <div class="m-side-item"><span>📁</span>Projects</div>
+              <div class="m-side-item"><span>🖼</span>Pictures</div>
+            </div>
+            <div class="m-grid">
+              <div class="m-tile"><div class="m-tile-icon">📁</div>synth-lab</div>
+              <div class="m-tile"><div class="m-tile-icon">📁</div>tanyel-os</div>
+              <div class="m-tile"><div class="m-tile-icon">📁</div>paper-ui</div>
+              <div class="m-tile"><div class="m-tile-icon">📁</div>fieldnotes</div>
+              <div class="m-tile"><div class="m-tile-icon">📄</div>readme.md</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- taskbar -->
+      <div class="m-taskbar">
+        <div class="m-start"><div class="m-start-mark"></div>Start</div>
+        <div class="m-tb-divider"></div>
+        <div class="m-tb-app active"><span style="font-size:9px;font-family:monospace">&gt;_</span> Terminal</div>
+        <div class="m-tb-app"><span>📁</span> Files</div>
+        <div class="m-clock"><div class="t">10:42</div><div>Sat May 3</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Social proof ───────────────────────────────────────────── -->
+<div class="logos">
+  <div class="container">
+    <div class="logos-label">Built on open source</div>
+    <div class="logos-row">
+      <span class="logos-item">Ubuntu 24.04</span>
+      <span class="logos-item">GNOME 46</span>
+      <span class="logos-item">Wayland</span>
+      <span class="logos-item">GTK4</span>
+      <span class="logos-item">Plymouth</span>
+      <span class="logos-item">systemd</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Features ──────────────────────────────────────────────── -->
+<section id="features">
+  <div class="container">
+    <div class="section-label"><span class="tag">Features</span></div>
+    <h2 class="section-title">Everything you need.<br/>Nothing you don't.</h2>
+    <p class="section-sub">Built on Ubuntu, styled from scratch. Every pixel designed to feel intentional.</p>
+
+    <div class="features-grid">
+
+      <!-- Large card: terminal -->
+      <div class="feat-card feat-large fade-up">
+        <div>
+          <div class="feat-icon" style="font-size:22px;font-family:monospace">&gt;_</div>
+          <div class="feat-title">A terminal that actually works</div>
+          <p class="feat-desc" style="margin-bottom:16px">Full command set: <code style="font-family:var(--mono);font-size:12px;background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:4px">ls</code>, <code style="font-family:var(--mono);font-size:12px;background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:4px">cd</code>, <code style="font-family:var(--mono);font-size:12px;background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:4px">cat</code>, <code style="font-family:var(--mono);font-size:12px;background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:4px">mkdir</code>, <code style="font-family:var(--mono);font-size:12px;background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:4px">neofetch</code> and more. History navigation, Ctrl+L to clear, open files directly from the shell. JetBrains Mono, always.</p>
+          <p class="feat-desc">The terminal is a first-class citizen — not an afterthought bolted on.</p>
+        </div>
+        <div class="feat-large-visual">
+          <div class="mini-terminal">
+            <div><span class="mt-dim">TanyelOS terminal · type `help`</span></div>
+            <div>&nbsp;</div>
+            <div><span class="mt-prompt">tanyel@tanyel-os:~$</span> neofetch</div>
+            <div><span class="mt-dim">   ▄▄▄▄▄▄▄    </span><span style="color:#F0EDE8">tanyel@tanyel-os</span></div>
+            <div><span class="mt-dim"> ▄█████████▄  </span><span class="mt-dim">OS:     TanyelOS 1.0</span></div>
+            <div><span class="mt-dim">████ TOS ████ </span><span class="mt-dim">Kernel: 6.8.0-generic</span></div>
+            <div><span class="mt-dim"> ▀█████████▀  </span><span class="mt-dim">Shell:  tsh 0.1</span></div>
+            <div><span class="mt-dim">   ▀▀▀▀▀▀▀    </span><span class="mt-dim">Theme:  dark · teal</span></div>
+            <div>&nbsp;</div>
+            <div><span class="mt-prompt">tanyel@tanyel-os:~$</span> cd projects/synth-lab</div>
+            <div><span class="mt-prompt">tanyel@tanyel-os:~/projects/synth-lab$</span> ls</div>
+            <div><span class="mt-green">demo.mp4</span>  <span class="mt-green">hero.png</span>  <span class="mt-blue">readme.md</span></div>
+            <div>&nbsp;</div>
+            <div><span class="mt-prompt">tanyel@tanyel-os:~/projects/synth-lab$</span> <span class="mt-cursor"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feat-card fade-up">
+        <div class="feat-icon">🚀</div>
+        <div class="feat-title">Boot animation</div>
+        <p class="feat-desc">TanyelOS logo fades in over a dark background. A smooth progress bar. Status messages. The whole OS-startup theatre — done right.</p>
+      </div>
+
+      <div class="feat-card fade-up">
+        <div class="feat-icon">🪟</div>
+        <div class="feat-title">Draggable windows</div>
+        <p class="feat-desc">Drag, resize, minimize, maximize, close. Traffic-light buttons. Click to bring to front. Double-click titlebar to maximize. It works exactly the way you expect.</p>
+      </div>
+
+      <div class="feat-card fade-up">
+        <div class="feat-icon">📁</div>
+        <div class="feat-title">File Explorer</div>
+        <p class="feat-desc">Sidebar with places, breadcrumb navigation, grid view with icons. Double-click to open files and folders. Single-click to select.</p>
+      </div>
+
+      <div class="feat-card fade-up">
+        <div class="feat-icon">📋</div>
+        <div class="feat-title">Taskbar + Start menu</div>
+        <p class="feat-desc">Frosted glass taskbar at the bottom. All open windows listed. Click to restore or minimize. Start button opens a searchable app grid.</p>
+      </div>
+
+      <div class="feat-card fade-up">
+        <div class="feat-icon">🖱️</div>
+        <div class="feat-title">Right-click menu</div>
+        <p class="feat-desc">Right-click the desktop for quick actions: refresh, change wallpaper, toggle theme, open terminal, open files, display settings.</p>
+      </div>
+
+      <div class="feat-card fade-up">
+        <div class="feat-icon">🖥️</div>
+        <div class="feat-title">Desktop icons</div>
+        <p class="feat-desc">Click to select with highlight. Double-click to open. Right-click for context. Drag-select multiple icons. All the desktop basics, none of the clutter.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Customise ──────────────────────────────────────────────── -->
+<section id="customise" class="custom-section">
+  <div class="container">
+    <div class="section-label"><span class="tag">Customise</span></div>
+    <h2 class="section-title">Make it yours.</h2>
+    <p class="section-sub">Accent color, theme, font, wallpaper — all changeable in Settings without touching a config file.</p>
+
+    <!-- Accent chips -->
+    <div class="accents-row fade-up" id="accentRow">
+      <div class="accent-chip active" data-accent="#2B9EA8" onclick="setAccent(this)">
+        <div class="accent-dot" style="background:#2B9EA8"></div> Teal
+      </div>
+      <div class="accent-chip" data-accent="#D4A843" onclick="setAccent(this)">
+        <div class="accent-dot" style="background:#D4A843"></div> Amber
+      </div>
+      <div class="accent-chip" data-accent="#E05C4A" onclick="setAccent(this)">
+        <div class="accent-dot" style="background:#E05C4A"></div> Rose
+      </div>
+      <div class="accent-chip" data-accent="#8B6FC2" onclick="setAccent(this)">
+        <div class="accent-dot" style="background:#8B6FC2"></div> Violet
+      </div>
+      <div class="accent-chip" data-accent="#5DB348" onclick="setAccent(this)">
+        <div class="accent-dot" style="background:#5DB348"></div> Lime
+      </div>
+    </div>
+
+    <!-- Wallpaper picker -->
+    <div class="wallpaper-row fade-up">
+      <div class="wp-thumb wp-aurora active"><span class="wp-thumb-label">Aurora</span></div>
+      <div class="wp-thumb wp-dusk"><span class="wp-thumb-label">Dusk</span></div>
+      <div class="wp-thumb wp-grid"><span class="wp-thumb-label">Grid</span></div>
+      <div class="wp-thumb wp-topo"><span class="wp-thumb-label">Topo</span></div>
+      <div class="wp-thumb wp-solid"><span class="wp-thumb-label">Solid</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Download ───────────────────────────────────────────────── -->
+<section id="download" class="download-section">
+  <div class="container">
+    <div class="section-label"><span class="tag">Download</span></div>
+    <h2 class="section-title">Ready when you are.</h2>
+    <p class="section-sub">One ISO. Boot it live, install it, or run it in a VM. No account needed.</p>
+
+    <div class="download-box fade-up">
+      <div class="dl-version">Latest release</div>
+      <div class="dl-name">TanyelOS 1.0</div>
+      <div class="dl-size">~2.5 GB · amd64 · Ubuntu 24.04 base</div>
+
+      <button class="dl-btn">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a.75.75 0 0 1 .75.75v7.19l2.72-2.72a.75.75 0 1 1 1.06 1.06L8 11.81 3.47 7.28a.75.75 0 1 1 1.06-1.06L7.25 8.94V1.75A.75.75 0 0 1 8 1ZM1.5 13.25a.75.75 0 0 1 .75-.75h11.5a.75.75 0 0 1 0 1.5H2.25a.75.75 0 0 1-.75-.75Z"/></svg>
+        tanyelos-1.0-amd64.iso
+      </button>
+
+      <div class="dl-options">
+        <button class="dl-opt">🔏 SHA256</button>
+        <button class="dl-opt">📋 Torrent</button>
+        <button class="dl-opt">🪞 Mirror</button>
+      </div>
+
+      <div class="dl-sha">SHA256: a3f8c2d1e9b04f5a7c6d2e1b8f3a9c4d7e2b0f5a1c8d3e6b9f2a4c7d0e1b3f6</div>
+    </div>
+
+    <!-- System requirements -->
+    <div style="margin-top:64px">
+      <h3 class="section-title" style="font-size:24px;margin-bottom:32px">System requirements</h3>
+      <div class="req-grid fade-up">
+        <div class="req-card">
+          <div class="req-title">Minimum</div>
+          <div class="req-row"><span class="req-key">CPU</span><span class="req-val">2-core 64-bit</span></div>
+          <div class="req-row"><span class="req-key">RAM</span><span class="req-val">2 GB</span></div>
+          <div class="req-row"><span class="req-key">Storage</span><span class="req-val">20 GB</span></div>
+          <div class="req-row"><span class="req-key">Display</span><span class="req-val">1024×768</span></div>
+          <div class="req-row"><span class="req-key">Boot</span><span class="req-val">UEFI or BIOS</span></div>
+        </div>
+        <div class="req-card">
+          <div class="req-title">Recommended</div>
+          <div class="req-row"><span class="req-key">CPU</span><span class="req-val">4-core 64-bit</span></div>
+          <div class="req-row"><span class="req-key">RAM</span><span class="req-val">8 GB</span></div>
+          <div class="req-row"><span class="req-key">Storage</span><span class="req-val">40 GB SSD</span></div>
+          <div class="req-row"><span class="req-key">Display</span><span class="req-val">1920×1080</span></div>
+          <div class="req-row"><span class="req-key">GPU</span><span class="req-val">Any (for blur)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VM guide -->
+    <div class="vm-grid fade-up">
+      <div class="vm-card">
+        <h3>VirtualBox <span class="vm-badge free">Free</span> <span class="vm-badge win">Windows</span></h3>
+        <ol class="vm-steps">
+          <li>Download VirtualBox at virtualbox.org</li>
+          <li>New VM → Linux → Ubuntu 64-bit</li>
+          <li>4 GB RAM · 2 CPU · 25 GB disk</li>
+          <li>Storage → attach the ISO</li>
+          <li>Display → 128 MB VRAM · VMSVGA</li>
+          <li>Boot and enjoy</li>
+        </ol>
+      </div>
+      <div class="vm-card">
+        <h3>VMware Player <span class="vm-badge free">Free</span> <span class="vm-badge win">Windows</span></h3>
+        <ol class="vm-steps">
+          <li>Download VMware Workstation Player</li>
+          <li>New VM → installer disc image → ISO</li>
+          <li>4 GB RAM · 2 CPU · 25 GB disk</li>
+          <li>Enable 3D acceleration in settings</li>
+          <li>Boot — VMware Tools installs auto</li>
+        </ol>
+      </div>
+      <div class="vm-card">
+        <h3>USB Flash Drive</h3>
+        <ol class="vm-steps">
+          <li>Download Balena Etcher (Windows)</li>
+          <li>Flash the ISO to a USB drive</li>
+          <li>Restart PC, boot from USB</li>
+          <li>Try TanyelOS live — nothing installed</li>
+          <li>Click "Install" to make it permanent</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="nav-logo">
+          <div class="nav-logo-mark">T</div>
+          TanyelOS
+        </div>
+        <p>A beautiful Linux desktop built for people who care about how their tools look and feel.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#customise">Customise</a></li>
+          <li><a href="#download">Download</a></li>
+          <li><a href="#">Release notes</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Install guide</a></li>
+          <li><a href="#">VM setup</a></li>
+          <li><a href="#">Build from source</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <ul>
+          <li><a href="https://github.com/tanyel/tanyel-os">GitHub</a></li>
+          <li><a href="#">Issues & feedback</a></li>
+          <li><a href="#">Contribute</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 TanyelOS · Free and open source</span>
+      <span>Based on <a href="https://ubuntu.com">Ubuntu</a> · <a href="#">MIT License</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Scroll fade-in ─────────────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ── Accent picker ──────────────────────────────────────────────
+function setAccent(chip) {
+  document.querySelectorAll('.accent-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  const color = chip.dataset.accent;
+  document.documentElement.style.setProperty('--accent', color);
+  document.documentElement.style.setProperty('--accent-hi', color);
+  document.documentElement.style.setProperty('--accent-glow', color + '33');
+}
+
+// ── Wallpaper picker ───────────────────────────────────────────
+document.querySelectorAll('.wp-thumb').forEach(wp => {
+  wp.addEventListener('click', () => {
+    document.querySelectorAll('.wp-thumb').forEach(w => w.classList.remove('active'));
+    wp.classList.add('active');
+  });
+});
+
+// ── Nav scroll shadow ──────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.querySelector('nav').style.borderBottomColor =
+    window.scrollY > 10 ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)';
+});
+</script>
+</body>
+</html>

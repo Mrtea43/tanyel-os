@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=TanyelOS
+Description=TanyelOS boot animation — logo, progress bar, status text
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/tanyel
+ScriptFile=/usr/share/plymouth/themes/tanyel/tanyel.script

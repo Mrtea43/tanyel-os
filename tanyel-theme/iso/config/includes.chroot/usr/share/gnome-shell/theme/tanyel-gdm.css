@@ -1,0 +1,170 @@
+/* TanyelOS GDM Login Screen Theme
+   Applied via /etc/gdm3/greeter.dconf-defaults or gnome-shell override
+   Matches the TanyelOS dark aesthetic: dark bg, accent teal, Geist font
+*/
+
+/* ── Stage background ───────────────────────────────────────── */
+#lockDialogGroup {
+  background-color: #1B1F2A;
+  /* Aurora wallpaper approximation via gradient — matches .t-wp-aurora */
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% 30%, rgba(43, 158, 168, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 80% 70%, rgba(60, 80, 160, 0.30) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(30, 60, 120, 0.25) 0%, transparent 60%),
+    linear-gradient(180deg, #1B2035 0%, #141822 100%);
+}
+
+/* ── Login dialog box ───────────────────────────────────────── */
+.login-dialog {
+  background-color: rgba(44, 49, 65, 0.85);
+  border: 0.5px solid rgba(58, 63, 82, 0.8);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 12px 40px rgba(0, 0, 0, 0.5);
+  padding: 32px 28px;
+  spacing: 16px;
+  width: 360px;
+}
+
+/* ── User avatar ────────────────────────────────────────────── */
+.login-dialog-user-list-item .user-icon {
+  border-radius: 50%;
+  border: 2px solid rgba(43, 158, 168, 0.4);
+  width: 72px;
+  height: 72px;
+}
+
+/* ── Username ───────────────────────────────────────────────── */
+.login-dialog-username-label {
+  font-family: "Geist", "Inter", system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #F5F3EF;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+/* ── Subtitle / hint ────────────────────────────────────────── */
+.login-dialog-prompt-label {
+  font-family: "Geist", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: #948E88;
+  text-align: center;
+}
+
+/* ── Password entry ─────────────────────────────────────────── */
+.login-dialog-prompt-entry {
+  background-color: rgba(27, 31, 42, 0.8);
+  border: 0.5px solid #3A3F52;
+  border-radius: 8px;
+  color: #F5F3EF;
+  padding: 10px 14px;
+  font-family: "Geist", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  caret-color: #2B9EA8;
+  min-width: 240px;
+}
+
+.login-dialog-prompt-entry:focus {
+  border-color: #2B9EA8;
+  box-shadow: 0 0 0 3px rgba(43, 158, 168, 0.15);
+}
+
+/* ── Login button ───────────────────────────────────────────── */
+.login-dialog-button {
+  background-color: #2B9EA8;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 9px 20px;
+  font-family: "Geist", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.login-dialog-button:hover {
+  background-color: #33B5C0;
+}
+
+.login-dialog-button:active {
+  background-color: #258E97;
+}
+
+/* ── Error message ──────────────────────────────────────────── */
+.login-dialog-error-label {
+  font-family: "Geist", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: #E05C4A;
+  text-align: center;
+}
+
+/* ── Session/accessibility indicators at bottom ─────────────── */
+.login-dialog-sessionlist-button {
+  color: #948E88;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.login-dialog-sessionlist-button:hover {
+  background-color: rgba(245, 243, 239, 0.06);
+  color: #F5F3EF;
+}
+
+/* ── Clock on login screen ──────────────────────────────────── */
+.login-dialog-not-listed-label,
+.clock-display {
+  font-family: "Geist", "Inter", system-ui, sans-serif;
+  color: rgba(245, 243, 239, 0.9);
+}
+
+/* ── User switcher list ──────────────────────────────────────── */
+.login-dialog-user-list {
+  spacing: 8px;
+}
+
+.login-dialog-user-list-item {
+  border-radius: 10px;
+  padding: 12px 16px;
+  spacing: 12px;
+  color: #F5F3EF;
+}
+
+.login-dialog-user-list-item:hover {
+  background-color: rgba(245, 243, 239, 0.06);
+}
+
+.login-dialog-user-list-item:selected,
+.login-dialog-user-list-item:focus {
+  background-color: rgba(43, 158, 168, 0.18);
+}
+
+.login-dialog-user-list-item .user-real-name {
+  font-family: "Geist", "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #F5F3EF;
+}
+
+.login-dialog-user-list-item .user-username {
+  font-size: 12px;
+  color: #948E88;
+}
+
+/* ── Lock screen overlay ─────────────────────────────────────── */
+.unlock-dialog {
+  background-color: rgba(44, 49, 65, 0.85);
+  border: 0.5px solid rgba(58, 63, 82, 0.8);
+  border-radius: 14px;
+}
+
+/* ── Fingerprint / smartcard prompt ─────────────────────────── */
+.login-dialog-fingerprint-icon {
+  color: #2B9EA8;
+}
+
+/* ── Spinner ─────────────────────────────────────────────────── */
+.login-dialog .spinner {
+  color: #2B9EA8;
+}

@@ -1,0 +1,375 @@
+/* TanyelOS GNOME Shell Theme
+   Styles the top panel, dash-to-panel taskbar, overview, notifications, menus.
+   Requires: User Themes extension + Dash to Panel + Blur my Shell
+*/
+
+/* ── Variables ──────────────────────────────────────────────── */
+/* Light mode defaults; dark overrides below via .dark class on #stage */
+
+/* ── Top panel ──────────────────────────────────────────────── */
+#panel {
+  height: 28px;
+  background-color: rgba(253, 252, 251, 0.70);
+  border-bottom: 0.5px solid rgba(216, 212, 207, 0.8);
+  font-family: "Geist", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: #635E57;
+  /* Blur effect applied by "Blur my Shell" extension */
+}
+
+/* Panel logo / app name */
+#panel .panel-button {
+  color: #635E57;
+  font-size: 12px;
+  padding: 0 8px;
+  border-radius: 0;
+  transition-duration: 100ms;
+  -natural-hpadding: 8px;
+  -minimum-hpadding: 4px;
+}
+
+#panel .panel-button:hover {
+  background-color: rgba(49, 46, 41, 0.06);
+  color: #312E29;
+}
+
+#panel .panel-button:active,
+#panel .panel-button:focus,
+#panel .panel-button:checked {
+  background-color: rgba(43, 158, 168, 0.15);
+  color: #312E29;
+}
+
+/* App menu label in panel */
+#panel #appMenu .label-shadow {
+  color: transparent;
+}
+
+#panel #appMenu .panel-button-label {
+  font-weight: 600;
+  color: #312E29;
+  font-size: 12px;
+}
+
+/* Clock */
+#panel .clock {
+  font-weight: 500;
+  font-size: 12px;
+  color: #312E29;
+  font-variant-numeric: tabular-nums;
+}
+
+/* System indicators (wifi, battery, etc.) */
+#panel .system-status-icon {
+  icon-size: 14px;
+}
+
+/* ── Dash-to-Panel taskbar ───────────────────────────────────── */
+/* Positioned at the bottom; matches .t-taskbar from TanyelOS.html */
+#dashtopanelMainPanel {
+  background-color: rgba(253, 252, 251, 0.78) !important;
+  border-top: 0.5px solid rgba(216, 212, 207, 0.8) !important;
+  border-radius: 0 !important;
+  height: 48px !important;
+  padding: 0 8px !important;
+  /* Blur applied by Blur my Shell */
+}
+
+/* Running app buttons in taskbar */
+#dashtopanelMainPanel .app-well-app,
+#dashtopanelMainPanel .dash-item-container > .overview-icon {
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+}
+
+#dashtopanelMainPanel .app-well-app:hover {
+  background-color: rgba(49, 46, 41, 0.06) !important;
+}
+
+#dashtopanelMainPanel .app-well-app.focused {
+  background-color: rgba(49, 46, 41, 0.08) !important;
+}
+
+/* Active indicator dot (matches ::after in TanyelOS taskbar) */
+#dashtopanelMainPanel .app-well-app .running-indicator {
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: #2B9EA8;
+}
+
+/* ── Overview / Activities ───────────────────────────────────── */
+#overview {
+  background-color: rgba(37, 41, 53, 0.95);
+}
+
+.search-entry {
+  background-color: rgba(44, 49, 65, 0.8);
+  border: 0.5px solid #3A3F52;
+  border-radius: 8px;
+  color: #F5F3EF;
+  padding: 8px 12px;
+  font-size: 13px;
+  caret-color: #2B9EA8;
+}
+
+.search-entry:focus {
+  border-color: #2B9EA8;
+  box-shadow: 0 0 0 3px rgba(43, 158, 168, 0.15);
+}
+
+.search-entry StIcon.search-entry-icon {
+  icon-size: 16px;
+  color: #948E88;
+}
+
+/* App grid in overview */
+.icon-grid .overview-icon {
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.icon-grid .overview-icon:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.icon-grid .overview-icon .icon-label {
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* Workspace thumbnails */
+.workspace-thumbnail-indicator {
+  border: 2px solid #2B9EA8;
+  border-radius: 6px;
+}
+
+/* ── Application menu (ArcMenu / start menu) ─────────────────── */
+/* Matches .t-startmenu from TanyelOS.html */
+.arcmenu-container {
+  background-color: rgba(253, 252, 251, 0.85) !important;
+  border: 0.5px solid rgba(216, 212, 207, 0.8) !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 1px 2px rgba(20, 20, 20, 0.06),
+    0 8px 24px rgba(20, 20, 20, 0.16) !important;
+  padding: 16px !important;
+  font-family: "Geist", "Inter", system-ui !important;
+}
+
+.arcmenu-container .search-entry {
+  background-color: rgba(237, 234, 229, 0.8);
+  border: 0.5px solid rgba(216, 212, 207, 0.8);
+  border-radius: 8px;
+  color: #312E29;
+  margin-bottom: 14px;
+}
+
+.arcmenu-container .menu-item-name {
+  font-size: 11px;
+  color: #312E29;
+}
+
+.arcmenu-container .menu-item-icon {
+  border-radius: 8px;
+  background-color: rgba(43, 158, 168, 0.12);
+}
+
+.arcmenu-container .menu-item:hover .menu-item-icon {
+  background-color: rgba(43, 158, 168, 0.2);
+}
+
+/* ── Right-click context menu ───────────────────────────────── */
+.popup-menu {
+  background-color: rgba(253, 252, 251, 0.92);
+  border: 0.5px solid rgba(216, 212, 207, 0.8);
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px rgba(20, 20, 20, 0.06),
+    0 8px 24px rgba(20, 20, 20, 0.16);
+  padding: 4px;
+  color: #312E29;
+  font-size: 13px;
+  font-family: "Geist", "Inter", system-ui;
+}
+
+.popup-menu-item {
+  border-radius: 5px;
+  padding: 7px 10px;
+  color: #312E29;
+}
+
+.popup-menu-item:hover {
+  background-color: #2B9EA8;
+  color: white;
+}
+
+.popup-menu-item:disabled,
+.popup-menu-item.insensitive {
+  color: #9B9590;
+}
+
+.popup-separator-menu-item {
+  height: 0.5px;
+  background-color: rgba(216, 212, 207, 0.8);
+  margin: 4px 6px;
+}
+
+.popup-menu-item .button-ornament,
+.popup-menu-item .inactive-ornament {
+  color: #9B9590;
+  font-size: 11px;
+}
+
+/* ── Notifications ──────────────────────────────────────────── */
+.notification-banner {
+  background-color: rgba(253, 252, 251, 0.92);
+  border: 0.5px solid rgba(216, 212, 207, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(20, 20, 20, 0.12);
+  padding: 14px 16px;
+  color: #312E29;
+  font-family: "Geist", "Inter", system-ui;
+}
+
+.notification-banner .notification-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #312E29;
+}
+
+.notification-banner .notification-body {
+  font-size: 12px;
+  color: #635E57;
+}
+
+/* ── Calendar / clock popover ───────────────────────────────── */
+.datemenu-todayhighlighter {
+  border-color: #2B9EA8;
+  background-color: rgba(43, 158, 168, 0.15);
+  border-radius: 50%;
+}
+
+/* ── Window preview (alt-tab / overview) ─────────────────────── */
+.window-clone-border {
+  border: 2px solid #2B9EA8;
+  border-radius: 8px;
+}
+
+.window-picker-icon {
+  border-radius: 10px;
+}
+
+/* ── Workspace switcher popup ────────────────────────────────── */
+.workspace-switcher-container {
+  background-color: rgba(44, 49, 65, 0.85);
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.workspace-switcher .ws-switcher-box {
+  border-radius: 6px;
+  border: 0.5px solid #3A3F52;
+}
+
+.workspace-switcher .ws-switcher-box.active-workspace {
+  background-color: rgba(43, 158, 168, 0.3);
+  border-color: #2B9EA8;
+}
+
+/* ── OSD (volume/brightness overlay) ────────────────────────── */
+.osd-window {
+  background-color: rgba(44, 49, 65, 0.85);
+  border-radius: 10px;
+  border: 0.5px solid #3A3F52;
+  color: #F5F3EF;
+  padding: 14px 20px;
+}
+
+.osd-window .level {
+  background-color: #3A3F52;
+  border-radius: 999px;
+  height: 4px;
+}
+
+.osd-window .level-fill {
+  background-color: #2B9EA8;
+  border-radius: 999px;
+}
+
+/* ── Screenshot UI ───────────────────────────────────────────── */
+.screenshot-ui-panel {
+  background-color: rgba(253, 252, 251, 0.92);
+  border-radius: 10px;
+  border: 0.5px solid rgba(216, 212, 207, 0.8);
+}
+
+/* ── Dark mode overrides ─────────────────────────────────────── */
+.dark #panel {
+  background-color: rgba(37, 41, 53, 0.78);
+  border-bottom-color: rgba(58, 63, 82, 0.8);
+  color: #C7C2BB;
+}
+
+.dark #panel .panel-button {
+  color: #C7C2BB;
+}
+
+.dark #panel .panel-button:hover {
+  background-color: rgba(245, 243, 239, 0.06);
+  color: #F5F3EF;
+}
+
+.dark #panel .panel-button:active,
+.dark #panel .panel-button:checked {
+  background-color: rgba(43, 158, 168, 0.2);
+  color: #F5F3EF;
+}
+
+.dark #panel .clock {
+  color: #F5F3EF;
+}
+
+.dark #dashtopanelMainPanel {
+  background-color: rgba(37, 41, 53, 0.78) !important;
+  border-top-color: rgba(58, 63, 82, 0.8) !important;
+}
+
+.dark #dashtopanelMainPanel .app-well-app:hover {
+  background-color: rgba(245, 243, 239, 0.06) !important;
+}
+
+.dark .popup-menu {
+  background-color: rgba(44, 49, 65, 0.92);
+  border-color: rgba(58, 63, 82, 0.8);
+  color: #F5F3EF;
+}
+
+.dark .popup-menu-item {
+  color: #F5F3EF;
+}
+
+.dark .notification-banner {
+  background-color: rgba(44, 49, 65, 0.92);
+  border-color: rgba(58, 63, 82, 0.8);
+  color: #F5F3EF;
+}
+
+.dark .notification-banner .notification-title {
+  color: #F5F3EF;
+}
+
+.dark .notification-banner .notification-body {
+  color: #C7C2BB;
+}
+
+.dark .arcmenu-container {
+  background-color: rgba(44, 49, 65, 0.85) !important;
+  border-color: rgba(58, 63, 82, 0.8) !important;
+}
+
+.dark .arcmenu-container .menu-item-name {
+  color: #F5F3EF;
+}

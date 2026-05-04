@@ -1,0 +1,448 @@
+/* TanyelOS GTK4 Theme
+   Translated from TanyelOS.html design tokens
+   Target: Ubuntu 24.04 + GNOME 46
+*/
+
+/* ── Design tokens ──────────────────────────────────────────── */
+@define-color bg_0          #F5F3EF;
+@define-color bg_1          #FDFCFB;
+@define-color bg_2          #EDEAE5;
+@define-color fg_0          #312E29;
+@define-color fg_1          #635E57;
+@define-color fg_2          #9B9590;
+@define-color line          #D8D4CF;
+@define-color line_soft     #E5E1DC;
+@define-color accent        #2B9EA8;
+@define-color accent_soft   #DCF0F2;
+@define-color c_close       #E05C4A;
+@define-color c_min         #D4A843;
+@define-color c_max         #52B354;
+
+/* ── Base ───────────────────────────────────────────────────── */
+* {
+  -gtk-icon-style: regular;
+  outline-color: alpha(@accent, 0.5);
+  outline-offset: -2px;
+  outline-radius: 4px;
+}
+
+window,
+.background {
+  background-color: @bg_0;
+  color: @fg_0;
+}
+
+/* ── Typography ─────────────────────────────────────────────── */
+* {
+  font-family: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Window / Titlebar ──────────────────────────────────────── */
+window.csd,
+window.csd > decoration {
+  border-radius: 10px;
+  box-shadow:
+    0 1px 2px alpha(#141414, 0.06),
+    0 12px 32px alpha(#141414, 0.12),
+    0 24px 60px alpha(#141414, 0.10);
+}
+
+window.csd:not(:focus-within) > decoration {
+  box-shadow:
+    0 4px 16px alpha(#141414, 0.15);
+}
+
+headerbar {
+  background-color: @bg_2;
+  border-bottom: 0.5px solid @line;
+  padding: 0 8px;
+  min-height: 36px;
+  border-radius: 10px 10px 0 0;
+}
+
+headerbar .title {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: @fg_1;
+}
+
+headerbar:focus-within .title {
+  color: @fg_0;
+}
+
+/* Window control buttons */
+headerbar button.titlebutton {
+  border-radius: 50%;
+  min-width: 12px;
+  min-height: 12px;
+  padding: 0;
+  margin: 0 4px;
+  border: 0.5px solid alpha(#000, 0.15);
+  box-shadow: none;
+  background-size: 8px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+headerbar button.titlebutton.close  { background-color: @c_close; }
+headerbar button.titlebutton.minimize { background-color: @c_min; }
+headerbar button.titlebutton.maximize { background-color: @c_max; }
+
+headerbar:not(:focus-within) button.titlebutton {
+  background-color: @line;
+}
+
+headerbar button.titlebutton:hover {
+  filter: brightness(0.9);
+}
+
+/* ── Buttons ────────────────────────────────────────────────── */
+button {
+  background-color: @bg_1;
+  border: 0.5px solid @line;
+  border-radius: 6px;
+  color: @fg_0;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 0.1s, filter 0.1s;
+}
+
+button:hover {
+  background-color: @bg_2;
+}
+
+button:active {
+  filter: brightness(0.96);
+}
+
+button:disabled {
+  color: @fg_2;
+  background-color: @bg_2;
+}
+
+button.suggested-action {
+  background-color: @accent;
+  border-color: @accent;
+  color: white;
+}
+
+button.suggested-action:hover {
+  filter: brightness(1.05);
+}
+
+button.destructive-action {
+  background-color: @c_close;
+  border-color: @c_close;
+  color: white;
+}
+
+/* ── Flat / toolbar buttons ─────────────────────────────────── */
+button.flat,
+.toolbar button {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+button.flat:hover,
+.toolbar button:hover {
+  background-color: alpha(@fg_0, 0.06);
+  border-color: transparent;
+}
+
+/* ── Text entries ───────────────────────────────────────────── */
+entry,
+spinbutton {
+  background-color: @bg_2;
+  border: 0.5px solid @line;
+  border-radius: 6px;
+  color: @fg_0;
+  padding: 7px 10px;
+  font-size: 13px;
+  caret-color: @accent;
+}
+
+entry:focus,
+spinbutton:focus {
+  border-color: @accent;
+  box-shadow: 0 0 0 3px alpha(@accent, 0.15);
+}
+
+entry placeholder {
+  color: @fg_2;
+}
+
+/* ── Lists / Rows ───────────────────────────────────────────── */
+listview,
+list {
+  background-color: @bg_1;
+  border-radius: 10px;
+  border: 0.5px solid @line;
+}
+
+listview > row,
+list row {
+  padding: 10px 14px;
+  border-bottom: 0.5px solid @line_soft;
+  color: @fg_0;
+}
+
+listview > row:last-child,
+list row:last-child {
+  border-bottom: none;
+}
+
+listview > row:hover,
+list row:hover {
+  background-color: alpha(@fg_0, 0.04);
+}
+
+listview > row:selected,
+list row:selected {
+  background-color: @accent_soft;
+  color: @accent;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────── */
+.sidebar {
+  background-color: @bg_2;
+  border-right: 0.5px solid @line;
+}
+
+.sidebar listview > row,
+.sidebar list row {
+  border-radius: 5px;
+  margin: 1px 6px;
+  padding: 6px 8px;
+  border: none;
+  font-size: 12.5px;
+  color: @fg_1;
+}
+
+.sidebar listview > row:selected,
+.sidebar list row:selected {
+  background-color: @accent_soft;
+  color: @accent;
+  font-weight: 500;
+}
+
+/* ── Checkboxes / Radio ─────────────────────────────────────── */
+checkbutton check,
+radiobutton radio {
+  border: 1.5px solid @line;
+  border-radius: 4px;
+  background-color: @bg_1;
+  min-width: 16px;
+  min-height: 16px;
+}
+
+radiobutton radio {
+  border-radius: 50%;
+}
+
+checkbutton check:checked,
+radiobutton radio:checked {
+  background-color: @accent;
+  border-color: @accent;
+  color: white;
+}
+
+/* ── Switch ─────────────────────────────────────────────────── */
+switch {
+  background-color: @line;
+  border-radius: 999px;
+  min-width: 32px;
+  min-height: 18px;
+  border: none;
+}
+
+switch:checked {
+  background-color: #34c759;
+}
+
+switch slider {
+  background-color: white;
+  border-radius: 50%;
+  min-width: 14px;
+  min-height: 14px;
+  box-shadow: 0 1px 2px alpha(#000, 0.25);
+  margin: 2px;
+}
+
+/* ── Scale / Slider ─────────────────────────────────────────── */
+scale trough {
+  background-color: @line;
+  border-radius: 999px;
+  min-height: 4px;
+}
+
+scale highlight {
+  background-color: @accent;
+  border-radius: 999px;
+}
+
+scale slider {
+  background-color: white;
+  border: 0.5px solid @line;
+  border-radius: 50%;
+  min-width: 14px;
+  min-height: 14px;
+  box-shadow: 0 1px 3px alpha(#000, 0.2);
+}
+
+/* ── Progress bar ───────────────────────────────────────────── */
+progressbar trough {
+  background-color: @bg_2;
+  border-radius: 2px;
+  min-height: 4px;
+}
+
+progressbar progress {
+  background-color: @accent;
+  border-radius: 2px;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+scrollbar {
+  background-color: transparent;
+  border: none;
+}
+
+scrollbar slider {
+  background-color: alpha(@fg_0, 0.15);
+  border-radius: 999px;
+  min-width: 6px;
+  min-height: 6px;
+  margin: 2px;
+}
+
+scrollbar slider:hover {
+  background-color: alpha(@fg_0, 0.25);
+}
+
+scrollbar.vertical slider { min-width: 6px; }
+scrollbar.horizontal slider { min-height: 6px; }
+
+/* ── Menus ──────────────────────────────────────────────────── */
+popover,
+menu {
+  background-color: alpha(@bg_1, 0.92);
+  border: 0.5px solid @line;
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px alpha(#141414, 0.06),
+    0 8px 24px alpha(#141414, 0.16);
+  padding: 4px;
+  color: @fg_0;
+  font-size: 13px;
+}
+
+popover > contents {
+  border-radius: 8px;
+}
+
+menuitem,
+popover modelbutton {
+  border-radius: 5px;
+  padding: 7px 10px;
+  color: @fg_0;
+  min-height: 0;
+}
+
+menuitem:hover,
+popover modelbutton:hover {
+  background-color: @accent;
+  color: white;
+}
+
+menuitem accelerator {
+  color: alpha(@fg_2, 0.6);
+  font-size: 11px;
+}
+
+separator,
+menuitem + menuitem.separator {
+  background-color: @line;
+  min-height: 0.5px;
+  margin: 4px 6px;
+}
+
+/* ── Notebook / Tabs ────────────────────────────────────────── */
+notebook > header {
+  background-color: @bg_2;
+  border-bottom: 0.5px solid @line;
+  padding: 0 8px;
+}
+
+notebook > header > tabs > tab {
+  padding: 8px 14px;
+  color: @fg_2;
+  border-radius: 0;
+  font-size: 12.5px;
+  border-bottom: 2px solid transparent;
+}
+
+notebook > header > tabs > tab:checked {
+  color: @fg_0;
+  font-weight: 500;
+  border-bottom-color: @accent;
+}
+
+/* ── Tooltips ───────────────────────────────────────────────── */
+tooltip {
+  background-color: @fg_0;
+  color: @bg_1;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  border: none;
+}
+
+/* ── File chooser ───────────────────────────────────────────── */
+filechooser .path-bar button {
+  background: transparent;
+  border: none;
+  color: @fg_1;
+  font-size: 12px;
+  padding: 4px 6px;
+}
+
+filechooser .path-bar button:hover {
+  background-color: alpha(@fg_0, 0.08);
+  color: @fg_0;
+}
+
+/* ── Infobar ────────────────────────────────────────────────── */
+infobar {
+  background-color: @accent_soft;
+  border-bottom: 0.5px solid @line;
+  padding: 8px 14px;
+}
+
+/* ── Dark theme ─────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  @define-color bg_0        #252935;
+  @define-color bg_1        #2C3141;
+  @define-color bg_2        #1B1F2A;
+  @define-color fg_0        #F5F3EF;
+  @define-color fg_1        #C7C2BB;
+  @define-color fg_2        #948E88;
+  @define-color line        #3A3F52;
+  @define-color line_soft   #323749;
+  @define-color accent_soft #1A3B42;
+
+  entry,
+  spinbutton {
+    background-color: @bg_2;
+  }
+
+  tooltip {
+    background-color: @bg_1;
+    color: @fg_0;
+    border: 0.5px solid @line;
+  }
+}
