@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=TanyelOS Tweaks
+Comment=Customize your TanyelOS theme, accent color, font, and wallpaper
+Exec=/usr/bin/tanyelos-tweaks
+Icon=tanyelos-tweaks
+Terminal=false
+Categories=Settings;DesktopSettings;GTK;
+Keywords=theme;appearance;wallpaper;font;accent;tanyelos;tweaks;
+StartupNotify=true
+StartupWMClass=tanyelos-tweaks

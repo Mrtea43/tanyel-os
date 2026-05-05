@@ -1,0 +1,47 @@
+# TanyelOS default GNOME settings
+# Installed to /etc/dconf/db/tanyelos.d/00-tanyelos-defaults
+
+[org/gnome/desktop/interface]
+gtk-theme='tanyelos-teal-dark'
+color-scheme='prefer-dark'
+font-name='Geist 11'
+document-font-name='Geist 11'
+monospace-font-name='JetBrains Mono 10'
+icon-theme='Adwaita'
+cursor-theme='Adwaita'
+cursor-size=24
+text-scaling-factor=1.0
+enable-animations=true
+clock-show-seconds=false
+clock-show-weekday=true
+
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/tanyelos/aurora-dark.png'
+picture-uri-dark='file:///usr/share/backgrounds/tanyelos/aurora-dark.png'
+picture-options='zoom'
+primary-color='#121218'
+secondary-color='#121218'
+
+[org/gnome/desktop/screensaver]
+picture-uri='file:///usr/share/backgrounds/tanyelos/aurora-dark.png'
+primary-color='#121218'
+
+[org/gnome/desktop/wm/preferences]
+theme='tanyelos-teal-dark'
+titlebar-font='Geist Bold 11'
+button-layout='appmenu:minimize,maximize,close'
+
+[org/gnome/shell]
+favorite-apps=['org.gnome.Files.desktop', 'org.gnome.Terminal.desktop', 'io.tanyelos.Tweaks.desktop', 'org.gnome.Settings.desktop', 'firefox.desktop']
+
+[org/gnome/terminal/legacy]
+theme-variant='dark'
+
+[org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
+font='JetBrains Mono 11'
+use-system-font=false
+use-theme-colors=false
+background-color='#121218'
+foreground-color='#f5f3f0'
+cursor-colors-set=false
+bold-is-bright=true

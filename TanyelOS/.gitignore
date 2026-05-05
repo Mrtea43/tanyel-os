@@ -1,0 +1,27 @@
+# Generated outputs — not committed to git
+dist/
+*.iso
+
+# Generated wallpapers and themes (rebuilt by scripts)
+build/wallpapers/
+build/themes/
+build/tokens/
+
+# Generated .deb packages
+build/fonts/*.deb
+build/tweaks-app/*.deb
+build/fonts/deb-root/
+build/tweaks-app/deb-root/
+
+# Font downloads
+build/fonts/tanyelos-fonts/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
