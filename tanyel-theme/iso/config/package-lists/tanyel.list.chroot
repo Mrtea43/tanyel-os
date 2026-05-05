@@ -1,43 +1,14 @@
-# TanyelOS minimal package list
-# Only essentials — keeps build time under 30 minutes
+# TanyelOS — minimal confirmed-available packages for Ubuntu 24.04 Noble
 
-# ── Kernel + boot ─────────────────────────────────────────────
+# ── Kernel + live boot ────────────────────────────────────────
 linux-image-generic
-linux-firmware
 casper
 lupin-casper
-grub-efi-amd64
-grub-pc-bin
 
-# ── Display server ────────────────────────────────────────────
-xorg
-xserver-xorg
-
-# ── GNOME desktop (minimal) ───────────────────────────────────
-gnome-shell
-gnome-session
-gdm3
-gnome-terminal
-nautilus
-gnome-control-center
-gnome-tweaks
-gnome-shell-extension-manager
-
-# ── Fonts ─────────────────────────────────────────────────────
-fonts-inter
-fonts-jetbrains-mono
-fonts-noto-core
-
-# ── Network ───────────────────────────────────────────────────
-network-manager
-network-manager-gnome
+# ── GNOME desktop ─────────────────────────────────────────────
+ubuntu-gnome-desktop
 
 # ── Utilities ─────────────────────────────────────────────────
 curl
-wget
 unzip
 dconf-cli
-ca-certificates
-
-# ── Browser ───────────────────────────────────────────────────
-firefox
