@@ -170,6 +170,68 @@ done
 
 ok "Settings applied"
 
+# ── 7. Neofetch branding ──────────────────────────────────────
+step "7/7  Neofetch branding"
+
+sudo apt-get install -y --no-install-recommends neofetch 2>/dev/null || true
+
+NEOF_DIR="$HOME/.config/neofetch"
+mkdir -p "$NEOF_DIR"
+
+cat > "$NEOF_DIR/config.conf" <<'NEOF'
+print_info() {
+    info title
+    info underline
+    info "OS"         distro
+    info "Host"       model
+    info "Kernel"     kernel
+    info "Shell"      shell
+    info "Theme"      theme
+    info "Uptime"     uptime
+    prin ""
+}
+
+# Custom ASCII art (the TOS logo)
+ascii_distro="auto"
+image_backend="ascii"
+
+ascii_colors=(6 6 6 6 6 6)
+bold="on"
+underline_enabled="on"
+separator=":"
+
+distro_shorthand="off"
+os_arch="off"
+kernel_shorthand="on"
+shell_path="off"
+shell_version="off"
+uptime_shorthand="tiny"
+theme_bold="off"
+NEOF
+
+# Custom ASCII art for neofetch
+cat > "$NEOF_DIR/ascii" <<'ASCII'
+   ████████
+  ██      ██
+  ██  ██  ██
+  ██  ████ ██
+  ██      ██
+   ████████
+  TanyelOS
+ASCII
+
+# Override distro name shown by neofetch
+sudo tee /etc/os-release-tanyel > /dev/null <<'EOF'
+NAME="TanyelOS"
+VERSION="1.0"
+ID=tanyelos
+ID_LIKE=ubuntu
+PRETTY_NAME="TanyelOS 1.0"
+VERSION_ID="1.0"
+EOF
+
+ok "Neofetch configured"
+
 # ── Done ──────────────────────────────────────────────────────
 echo ""
 echo -e "${BOLD}${GREEN}  TanyelOS installed.${RESET}"
