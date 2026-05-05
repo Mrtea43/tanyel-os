@@ -1,4 +1,4 @@
-# TanyelOS — minimal confirmed-available packages for Ubuntu 24.04 Noble
+# TanyelOS — confirmed-available packages for Ubuntu 24.04 Noble
 
 # ── Kernel + live boot ────────────────────────────────────────
 linux-image-generic
@@ -8,7 +8,14 @@ lupin-casper
 # ── GNOME desktop ─────────────────────────────────────────────
 ubuntu-gnome-desktop
 
+# ── GNOME Shell extensions (user-theme extension built-in) ────
+gnome-shell-extensions
+
+# ── Fonts ─────────────────────────────────────────────────────
+fonts-jetbrains-mono
+
 # ── Utilities ─────────────────────────────────────────────────
 curl
 unzip
 dconf-cli
+python3
