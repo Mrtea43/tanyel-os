@@ -23,7 +23,9 @@ apt-get install -y --no-install-recommends \
     gir1.2-gtk-4.0 \
     gir1.2-adw-1 \
     libadwaita-1-0 \
-    gnome-user-share \
+    gnome-tweaks \
+    gnome-shell-extensions \
+    gnome-shell-extension-prefs \
     dconf-cli \
     fonts-open-sans
 

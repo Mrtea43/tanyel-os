@@ -33,6 +33,11 @@ button-layout='appmenu:minimize,maximize,close'
 
 [org/gnome/shell]
 favorite-apps=['org.gnome.Files.desktop', 'org.gnome.Terminal.desktop', 'io.tanyelos.Tweaks.desktop', 'org.gnome.Settings.desktop', 'firefox.desktop']
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
+disable-user-extensions=false
+
+[org/gnome/shell/extensions/user-theme]
+name='tanyelos-teal-dark'
 
 [org/gnome/terminal/legacy]
 theme-variant='dark'
