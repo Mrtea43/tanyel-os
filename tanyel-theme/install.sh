@@ -187,6 +187,25 @@ sudo install -dm755 /usr/share/plymouth/themes/tanyel
 sudo cp "$SCRIPT_DIR/plymouth/tanyel.script"   /usr/share/plymouth/themes/tanyel/
 sudo cp "$SCRIPT_DIR/plymouth/tanyel.plymouth" /usr/share/plymouth/themes/tanyel/
 
+# Generate logo.png for Plymouth (96x96 rounded teal square with white T)
+if command -v convert &>/dev/null; then
+  info "Generating Plymouth logo…"
+  TMPLOGO=$(mktemp -d)
+  # Rounded teal square (96x96)
+  convert -size 96x96 xc:none \
+    -fill '#2B9EA8' -draw "roundrectangle 0,0 95,95 22,22" \
+    "$TMPLOGO/logo-bg.png" 2>/dev/null
+  # White "T" overlay
+  convert "$TMPLOGO/logo-bg.png" \
+    -fill white -font DejaVu-Sans-Bold -pointsize 60 \
+    -gravity center -annotate +0+0 'T' \
+    "$TMPLOGO/logo.png" 2>/dev/null
+  if [[ -f "$TMPLOGO/logo.png" ]]; then
+    sudo cp "$TMPLOGO/logo.png" /usr/share/plymouth/themes/tanyel/logo.png
+  fi
+  rm -rf "$TMPLOGO"
+fi
+
 sudo update-alternatives --install \
   /usr/share/plymouth/themes/default.plymouth \
   default.plymouth \
