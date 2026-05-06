@@ -67,23 +67,42 @@
 
 /* ── Dash-to-Panel taskbar ───────────────────────────────────── */
 /* Dark-first design — matches TanyelOS bottom taskbar */
-#dashtopanelMainPanel {
+#dashtopanelMainPanel,
+#dashtopanelMainPanel.popup-menu-content,
+#dashtopanelMainPanel > * {
   background-color: rgba(27, 31, 42, 0.85) !important;
-  border-top: 0.5px solid rgba(58, 63, 82, 0.8) !important;
   border-radius: 0 !important;
-  height: 48px !important;
-  padding: 0 8px !important;
   color: #F5F3EF !important;
 }
 
-/* All text and icons in the taskbar — make sure they're readable on dark bg */
-#dashtopanelMainPanel .panel-button,
-#dashtopanelMainPanel .clock,
-#dashtopanelMainPanel .system-status-icon,
-#dashtopanelMainPanel StLabel,
-#dashtopanelMainPanel .panel-status-indicators-box,
-#dashtopanelMainPanel .panel-status-menu-box {
+#dashtopanelMainPanel {
+  border-top: 0.5px solid rgba(58, 63, 82, 0.8) !important;
+  height: 48px !important;
+  padding: 0 8px !important;
+}
+
+/* Aggressive override — every text/icon in the taskbar must be readable */
+#dashtopanelMainPanel,
+#dashtopanelMainPanel * {
   color: #F5F3EF !important;
+}
+
+/* Kill any inherited light backgrounds on indicator wrappers (Yaru leak) */
+#dashtopanelMainPanel .panel-button,
+#dashtopanelMainPanel .panel-status-indicators-box,
+#dashtopanelMainPanel .panel-status-menu-box,
+#dashtopanelMainPanel .system-status-icon,
+#dashtopanelMainPanel .dash-to-panel-wrapped-button,
+#dashtopanelMainPanel .panel-status-area,
+#dashtopanelMainPanel .panel-corner,
+#dashtopanelMainPanel .indicators {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Re-add hover state with dark theme */
+#dashtopanelMainPanel .panel-button:hover {
+  background-color: rgba(245, 243, 239, 0.10) !important;
 }
 
 #dashtopanelMainPanel .clock {

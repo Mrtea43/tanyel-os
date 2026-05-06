@@ -44,17 +44,24 @@ install_font_zip() {
   if ! curl -fsSL "$url" -o "$tmp/font.zip" 2>/dev/null; then
     warn "Could not download $name — skipping"
     rm -rf "$tmp"
-    return 0
+    return 1
   fi
-  unzip -q "$tmp/font.zip" -d "$tmp/out" 2>/dev/null || { warn "$name: zip extraction failed"; rm -rf "$tmp"; return 0; }
+  unzip -q "$tmp/font.zip" -d "$tmp/out" 2>/dev/null || { warn "$name: zip extraction failed"; rm -rf "$tmp"; return 1; }
   find "$tmp/out" -type f \( -name "$pattern" -o -name "${pattern/.ttf/.otf}" \) -exec cp {} "$FONT_DIR/" \; 2>/dev/null || true
   rm -rf "$tmp"
   ok "$name installed"
+  return 0
 }
 
-install_font_zip "Geist" \
+# Try Geist; if it fails, install Inter from apt as fallback
+if ! install_font_zip "Geist" \
   "https://github.com/vercel/geist-font/releases/latest/download/Geist.zip" \
-  "*.ttf"
+  "*.ttf"; then
+  info "Falling back to Inter via apt…"
+  sudo apt-get install -y --no-install-recommends fonts-inter 2>/dev/null \
+    && ok "Inter installed (Geist substitute)" \
+    || warn "Inter unavailable too — system default font will be used"
+fi
 
 # JetBrains Mono is already installed via apt in step 0
 ok "JetBrains Mono already installed (apt)"
@@ -186,7 +193,26 @@ sudo update-alternatives --install \
   /usr/share/plymouth/themes/tanyel/tanyel.plymouth \
   200 2>/dev/null || true
 
-sudo update-initramfs -u 2>/dev/null || warn "Could not update initramfs — reboot may not show boot animation"
+sudo update-alternatives --set default.plymouth \
+  /usr/share/plymouth/themes/tanyel/tanyel.plymouth 2>/dev/null || true
+
+# Ensure GRUB has 'quiet splash' so Plymouth shows on boot
+GRUB_FILE="/etc/default/grub"
+if [[ -f "$GRUB_FILE" ]] && ! grep -q 'splash' "$GRUB_FILE"; then
+  info "Enabling Plymouth splash in GRUB…"
+  sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 quiet splash"/' "$GRUB_FILE"
+  sudo update-grub 2>/dev/null || warn "update-grub failed"
+fi
+
+# Set Plymouth theme via plymouth-set-default-theme (most reliable method)
+if command -v plymouth-set-default-theme &>/dev/null; then
+  sudo plymouth-set-default-theme -R tanyel 2>/dev/null || \
+    sudo update-initramfs -u 2>/dev/null || \
+    warn "Could not regenerate initramfs"
+else
+  sudo update-initramfs -u 2>/dev/null || warn "Could not update initramfs"
+fi
+
 ok "Plymouth boot theme installed"
 
 # ── 6. Apply GNOME settings ───────────────────────────────────
