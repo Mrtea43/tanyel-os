@@ -3,17 +3,17 @@
    Target: Ubuntu 24.04 + GNOME 46
 */
 
-/* ── Design tokens ──────────────────────────────────────────── */
-@define-color bg_0          #F5F3EF;
-@define-color bg_1          #FDFCFB;
-@define-color bg_2          #EDEAE5;
-@define-color fg_0          #312E29;
-@define-color fg_1          #635E57;
-@define-color fg_2          #9B9590;
-@define-color line          #D8D4CF;
-@define-color line_soft     #E5E1DC;
+/* ── Design tokens (DARK by default — TanyelOS is dark-first) ─────── */
+@define-color bg_0          #252935;
+@define-color bg_1          #2C3141;
+@define-color bg_2          #1B1F2A;
+@define-color fg_0          #F5F3EF;
+@define-color fg_1          #C7C2BB;
+@define-color fg_2          #948E88;
+@define-color line          #3A3F52;
+@define-color line_soft     #323749;
 @define-color accent        #2B9EA8;
-@define-color accent_soft   #DCF0F2;
+@define-color accent_soft   #1A3B42;
 @define-color c_close       #E05C4A;
 @define-color c_min         #D4A843;
 @define-color c_max         #52B354;

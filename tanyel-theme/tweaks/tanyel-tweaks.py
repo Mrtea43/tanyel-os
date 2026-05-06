@@ -167,7 +167,18 @@ class TweaksWindow(Adw.ApplicationWindow):
                 capture_output=True, text=True, timeout=30
             )
             if result.returncode == 0:
-                self._toast(f'Accent → {accent[2]}: wallpapers regenerated, theme updated')
+                self._toast(f'Accent → {accent[2]} applied. Restart apps to see the change.')
+                # Trigger a CSS reload by toggling the GTK theme rapidly
+                try:
+                    subprocess.Popen(
+                        ['bash', '-c',
+                         'gsettings set org.gnome.desktop.interface gtk-theme "Adwaita"; '
+                         'sleep 0.1; '
+                         'gsettings set org.gnome.desktop.interface gtk-theme "TanyelOS"'],
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                    )
+                except Exception:
+                    pass
             else:
                 self._toast(f'Accent change error: {result.stderr.strip()[:100]}')
         except FileNotFoundError:
