@@ -9,17 +9,17 @@
 /* ── Top panel ──────────────────────────────────────────────── */
 #panel {
   height: 28px;
-  background-color: rgba(253, 252, 251, 0.70);
-  border-bottom: 0.5px solid rgba(216, 212, 207, 0.8);
+  background-color: rgba(27, 31, 42, 0.85);
+  border-bottom: 0.5px solid rgba(58, 63, 82, 0.8);
   font-family: "Geist", "Inter", system-ui, sans-serif;
   font-size: 12px;
-  color: #635E57;
+  color: #F5F3EF;
   /* Blur effect applied by "Blur my Shell" extension */
 }
 
 /* Panel logo / app name */
 #panel .panel-button {
-  color: #635E57;
+  color: #F5F3EF;
   font-size: 12px;
   padding: 0 8px;
   border-radius: 0;
@@ -29,15 +29,15 @@
 }
 
 #panel .panel-button:hover {
-  background-color: rgba(49, 46, 41, 0.06);
-  color: #312E29;
+  background-color: rgba(245, 243, 239, 0.08);
+  color: #FFFFFF;
 }
 
 #panel .panel-button:active,
 #panel .panel-button:focus,
 #panel .panel-button:checked {
-  background-color: rgba(43, 158, 168, 0.15);
-  color: #312E29;
+  background-color: rgba(43, 158, 168, 0.20);
+  color: #FFFFFF;
 }
 
 /* App menu label in panel */
@@ -47,7 +47,7 @@
 
 #panel #appMenu .panel-button-label {
   font-weight: 600;
-  color: #312E29;
+  color: #F5F3EF;
   font-size: 12px;
 }
 
@@ -55,24 +55,46 @@
 #panel .clock {
   font-weight: 500;
   font-size: 12px;
-  color: #312E29;
+  color: #F5F3EF;
   font-variant-numeric: tabular-nums;
 }
 
 /* System indicators (wifi, battery, etc.) */
 #panel .system-status-icon {
   icon-size: 14px;
+  color: #F5F3EF;
 }
 
 /* ── Dash-to-Panel taskbar ───────────────────────────────────── */
-/* Positioned at the bottom; matches .t-taskbar from TanyelOS.html */
+/* Dark-first design — matches TanyelOS bottom taskbar */
 #dashtopanelMainPanel {
-  background-color: rgba(253, 252, 251, 0.78) !important;
-  border-top: 0.5px solid rgba(216, 212, 207, 0.8) !important;
+  background-color: rgba(27, 31, 42, 0.85) !important;
+  border-top: 0.5px solid rgba(58, 63, 82, 0.8) !important;
   border-radius: 0 !important;
   height: 48px !important;
   padding: 0 8px !important;
-  /* Blur applied by Blur my Shell */
+  color: #F5F3EF !important;
+}
+
+/* All text and icons in the taskbar — make sure they're readable on dark bg */
+#dashtopanelMainPanel .panel-button,
+#dashtopanelMainPanel .clock,
+#dashtopanelMainPanel .system-status-icon,
+#dashtopanelMainPanel StLabel,
+#dashtopanelMainPanel .panel-status-indicators-box,
+#dashtopanelMainPanel .panel-status-menu-box {
+  color: #F5F3EF !important;
+}
+
+#dashtopanelMainPanel .clock {
+  color: #FFFFFF !important;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+#dashtopanelMainPanel .system-status-icon {
+  color: #F5F3EF !important;
+  icon-size: 16px;
 }
 
 /* Running app buttons in taskbar */
@@ -80,14 +102,15 @@
 #dashtopanelMainPanel .dash-item-container > .overview-icon {
   border-radius: 8px !important;
   padding: 4px 10px !important;
+  color: #F5F3EF !important;
 }
 
 #dashtopanelMainPanel .app-well-app:hover {
-  background-color: rgba(49, 46, 41, 0.06) !important;
+  background-color: rgba(245, 243, 239, 0.08) !important;
 }
 
 #dashtopanelMainPanel .app-well-app.focused {
-  background-color: rgba(49, 46, 41, 0.08) !important;
+  background-color: rgba(245, 243, 239, 0.12) !important;
 }
 
 /* Active indicator dot (matches ::after in TanyelOS taskbar) */

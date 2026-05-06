@@ -71,7 +71,7 @@ class TweaksWindow(Adw.ApplicationWindow):
         # Theme row (dark/light toggle)
         theme_row = Adw.ActionRow()
         theme_row.set_title('Theme')
-        theme_row.set_subtitle('Switch between light and dark mode')
+        theme_row.set_subtitle('Affects system menus and apps. Shell stays dark by design.')
 
         theme_box = Gtk.Box(spacing=0, css_classes=['linked'])
         theme_box.set_valign(Gtk.Align.CENTER)
