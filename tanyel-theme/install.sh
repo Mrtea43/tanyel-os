@@ -71,10 +71,16 @@ mkdir -p "$EXT_DIR"
 install_extension() {
   local uuid="$1" name="$2"
   local ext_dir="$EXT_DIR/$uuid"
+  local sys_ext_dir="/usr/share/gnome-shell/extensions/$uuid"
   local local_zip="$SCRIPT_DIR/extensions/${uuid}.zip"
 
   if [[ -d "$ext_dir" && -n "$(ls -A "$ext_dir" 2>/dev/null)" ]]; then
-    ok "$name already installed"
+    ok "$name already installed (user)"
+    return 0
+  fi
+
+  if [[ -d "$sys_ext_dir" && -n "$(ls -A "$sys_ext_dir" 2>/dev/null)" ]]; then
+    ok "$name already installed (system, via apt)"
     return 0
   fi
 
@@ -185,6 +191,8 @@ ok "Plymouth boot theme installed"
 
 # ── 6. Apply GNOME settings ───────────────────────────────────
 step "6/6  Applying GNOME settings"
+
+WP_DIR="$HOME/.local/share/wallpapers/tanyel"
 
 # Install accent-applier script (regenerates wallpapers + patches CSS)
 info "Installing accent applier…"

@@ -37,27 +37,28 @@ if command -v convert &>/dev/null; then
   convert -size 1920x1080 gradient:'#1B2035-#141822' \
     \( -size 1920x1080 xc:none -fill "$RGBA45" -draw "circle 480,360 900,360" -blur 0x180 \) -compose over -composite \
     \( -size 1920x1080 xc:none -fill 'rgba(91,143,255,0.30)' -draw "circle 1500,750 1900,750" -blur 0x180 \) -compose over -composite \
-    "$WP_DIR/aurora.jpg"
+    "$WP_DIR/aurora.jpg" 2>/dev/null || echo "  ! Aurora failed"
 
   # Dusk — accent-tinted dusk gradient
   convert -size 1920x1080 gradient:'#6B3620-#1E1428' \
     \( -size 1920x1080 xc:none -fill "$RGBA30" -draw "circle 1200,540 1800,540" -blur 0x200 \) -compose over -composite \
-    "$WP_DIR/dusk.jpg"
+    "$WP_DIR/dusk.jpg" 2>/dev/null || echo "  ! Dusk failed"
 
-  # Grid — accent-colored grid lines on dark
+  # Grid — accent-colored centered glow on dark
   convert -size 1920x1080 xc:'#141822' \
-    \( -size 1920x1080 radial-gradient:"${RGBA20}-transparent" \) -compose over -composite \
-    "$WP_DIR/grid.jpg"
+    \( -size 1920x1080 xc:none -fill "$RGBA20" -draw "circle 960,540 1500,540" -blur 0x200 \) -compose over -composite \
+    "$WP_DIR/grid.jpg" 2>/dev/null || echo "  ! Grid failed"
 
   # Topo — accent contour rings
   convert -size 1920x1080 xc:'#1E2530' \
-    \( -size 1920x1080 radial-gradient:"${RGBA20}-transparent" \) -compose over -composite \
-    "$WP_DIR/topo.jpg"
+    \( -size 1920x1080 xc:none -fill "$RGBA20" -draw "circle 600,400 1100,400" -blur 0x150 \) -compose over -composite \
+    \( -size 1920x1080 xc:none -fill "$RGBA20" -draw "circle 1300,700 1700,700" -blur 0x150 \) -compose over -composite \
+    "$WP_DIR/topo.jpg" 2>/dev/null || echo "  ! Topo failed"
 
-  # Solid — solid color complement (slate with subtle accent vignette)
+  # Solid — slate with subtle accent vignette
   convert -size 1920x1080 xc:'#253040' \
-    \( -size 1920x1080 radial-gradient:"${RGBA18}-transparent" \) -compose over -composite \
-    "$WP_DIR/solid.jpg"
+    \( -size 1920x1080 xc:none -fill "$RGBA18" -draw "circle 960,540 1800,540" -blur 0x250 \) -compose over -composite \
+    "$WP_DIR/solid.jpg" 2>/dev/null || echo "  ! Solid failed"
 
   echo "  ✓ Wallpapers regenerated"
 else
