@@ -20,6 +20,16 @@ command -v gnome-shell &>/dev/null || fail "GNOME Shell not found. Requires Ubun
 GNOME_VER=$(gnome-shell --version | grep -oP '\d+' | head -1)
 info "GNOME Shell $GNOME_VER detected"
 
+# ── 0. Prerequisites ──────────────────────────────────────────
+step "0/6  Prerequisites"
+info "Installing required packages…"
+sudo apt-get update -qq 2>/dev/null || true
+sudo apt-get install -y --no-install-recommends \
+  curl unzip dconf-cli libglib2.0-bin gettext \
+  gnome-shell-extensions gnome-tweaks \
+  fonts-jetbrains-mono imagemagick 2>&1 | tail -3 || warn "Some packages could not be installed"
+ok "Prerequisites ready"
+
 # ── 1. Fonts ──────────────────────────────────────────────────
 step "1/6  Fonts"
 
@@ -28,12 +38,16 @@ mkdir -p "$FONT_DIR"
 
 install_font_zip() {
   local name="$1" url="$2" pattern="$3"
-  fc-list | grep -qi "$name" && { ok "$name already installed"; return; }
+  fc-list | grep -qi "$name" && { ok "$name already installed"; return 0; }
   info "Downloading $name…"
   local tmp; tmp=$(mktemp -d)
-  curl -fsSL "$url" -o "$tmp/font.zip" 2>/dev/null || { warn "Could not download $name — skipping"; rm -rf "$tmp"; return; }
-  unzip -q "$tmp/font.zip" -d "$tmp/out"
-  find "$tmp/out" -name "$pattern" | xargs -I{} cp {} "$FONT_DIR/"
+  if ! curl -fsSL "$url" -o "$tmp/font.zip" 2>/dev/null; then
+    warn "Could not download $name — skipping"
+    rm -rf "$tmp"
+    return 0
+  fi
+  unzip -q "$tmp/font.zip" -d "$tmp/out" 2>/dev/null || { warn "$name: zip extraction failed"; rm -rf "$tmp"; return 0; }
+  find "$tmp/out" -type f \( -name "$pattern" -o -name "${pattern/.ttf/.otf}" \) -exec cp {} "$FONT_DIR/" \; 2>/dev/null || true
   rm -rf "$tmp"
   ok "$name installed"
 }
@@ -42,11 +56,10 @@ install_font_zip "Geist" \
   "https://github.com/vercel/geist-font/releases/latest/download/Geist.zip" \
   "*.ttf"
 
-install_font_zip "JetBrains Mono" \
-  "https://github.com/JetBrains/JetBrainsMono/releases/latest/download/JetBrainsMono-2.304.zip" \
-  "*.ttf"
+# JetBrains Mono is already installed via apt in step 0
+ok "JetBrains Mono already installed (apt)"
 
-fc-cache -f "$FONT_DIR" 2>/dev/null
+fc-cache -f "$FONT_DIR" 2>/dev/null || true
 ok "Font cache updated"
 
 # ── 2. GNOME extensions ───────────────────────────────────────
