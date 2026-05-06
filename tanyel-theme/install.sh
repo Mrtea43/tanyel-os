@@ -155,7 +155,46 @@ ok "Plymouth boot theme installed"
 # ── 6. Apply GNOME settings ───────────────────────────────────
 step "6/6  Applying GNOME settings"
 
+# Generate Aurora wallpaper using ImageMagick
+info "Generating Aurora wallpaper…"
+sudo apt-get install -y imagemagick 2>/dev/null || true
+
+WP_DIR="$HOME/.local/share/wallpapers/tanyel"
+mkdir -p "$WP_DIR"
+
+if command -v convert &>/dev/null; then
+  convert -size 1920x1080 \
+    gradient:'#1B2035-#141822' \
+    \( -size 1920x1080 xc:none \
+       -fill 'rgba(43,158,168,0.45)' \
+       -draw "circle 480,360 900,360" \
+       -blur 0x180 \) \
+    -compose over -composite \
+    \( -size 1920x1080 xc:none \
+       -fill 'rgba(91,143,255,0.30)' \
+       -draw "circle 1500,750 1900,750" \
+       -blur 0x180 \) \
+    -compose over -composite \
+    "$WP_DIR/aurora.jpg" 2>/dev/null
+  ok "Aurora wallpaper generated"
+else
+  warn "ImageMagick missing — wallpaper not generated"
+fi
+
+# Apply dconf system defaults
 dconf load / < "$SCRIPT_DIR/tanyel-gnome.dconf"
+
+# Force key settings via gsettings (takes effect immediately)
+gsettings set org.gnome.desktop.interface gtk-theme 'TanyelOS' 2>/dev/null || true
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
+gsettings set org.gnome.desktop.interface monospace-font-name 'JetBrains Mono 11' 2>/dev/null || true
+gsettings set org.gnome.desktop.wm.preferences button-layout 'close,minimize,maximize:' 2>/dev/null || true
+
+if [[ -f "$WP_DIR/aurora.jpg" ]]; then
+  gsettings set org.gnome.desktop.background picture-uri "file://$WP_DIR/aurora.jpg" 2>/dev/null || true
+  gsettings set org.gnome.desktop.background picture-uri-dark "file://$WP_DIR/aurora.jpg" 2>/dev/null || true
+  gsettings set org.gnome.desktop.background picture-options 'zoom' 2>/dev/null || true
+fi
 
 # Enable all extensions
 for uuid in \
