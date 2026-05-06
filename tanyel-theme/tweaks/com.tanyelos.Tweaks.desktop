@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=TanyelOS Tweaks
+GenericName=System Tweaks
+Comment=Customize TanyelOS appearance, theme, accent, and wallpaper
+Exec=tanyel-tweaks
+Icon=preferences-desktop
+Terminal=false
+Type=Application
+Categories=Settings;DesktopSettings;GTK;
+Keywords=tweaks;settings;theme;wallpaper;accent;tanyelos;
+StartupNotify=true
