@@ -100,6 +100,12 @@ class TweaksWindow(Adw.ApplicationWindow):
 
         accent_dropdown = Gtk.DropDown.new_from_strings([a[2] for a in ACCENTS])
         accent_dropdown.set_valign(Gtk.Align.CENTER)
+        # Restore saved accent
+        saved_accent = self._read_saved_accent()
+        for i, a in enumerate(ACCENTS):
+            if a[1].lower() == saved_accent.lower():
+                accent_dropdown.set_selected(i)
+                break
         accent_dropdown.connect('notify::selected', self._on_accent_changed)
         accent_row.add_suffix(accent_dropdown)
         group.add(accent_row)
@@ -154,13 +160,20 @@ class TweaksWindow(Adw.ApplicationWindow):
 
     def _on_accent_changed(self, dropdown, _):
         accent = ACCENTS[dropdown.get_selected()]
-        # Store preference; full effect requires re-applying CSS
+        # Run the apply-accent script that regenerates wallpapers + patches CSS
         try:
-            subprocess.run(['gsettings', 'set', 'org.gnome.shell.extensions.dash-to-panel',
-                            'dot-color-1', accent[1]], check=False, capture_output=True)
-        except Exception:
-            pass
-        self._toast(f'Accent set to {accent[2]} — log out to fully apply')
+            result = subprocess.run(
+                ['/usr/local/bin/tanyel-apply-accent', accent[1]],
+                capture_output=True, text=True, timeout=30
+            )
+            if result.returncode == 0:
+                self._toast(f'Accent → {accent[2]}: wallpapers regenerated, theme updated')
+            else:
+                self._toast(f'Accent change error: {result.stderr.strip()[:100]}')
+        except FileNotFoundError:
+            self._toast('tanyel-apply-accent not found — run install.sh')
+        except subprocess.TimeoutExpired:
+            self._toast('Accent change timed out')
 
     def _on_font_changed(self, dropdown, _):
         font = FONTS[dropdown.get_selected()]
@@ -178,6 +191,13 @@ class TweaksWindow(Adw.ApplicationWindow):
             self.bg.set_string('picture-options', 'zoom')
         else:
             self._toast(f'Wallpaper not found: {wp_path}')
+
+    def _read_saved_accent(self):
+        try:
+            with open(os.path.expanduser('~/.config/tanyelos/accent')) as f:
+                return f.read().strip()
+        except (FileNotFoundError, OSError):
+            return '#2B9EA8'
 
     def _toast(self, msg):
         # Simple stderr log; could wire up Adw.Toast for proper UI feedback

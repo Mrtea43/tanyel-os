@@ -186,44 +186,14 @@ ok "Plymouth boot theme installed"
 # ── 6. Apply GNOME settings ───────────────────────────────────
 step "6/6  Applying GNOME settings"
 
-# Generate all 5 wallpapers using ImageMagick
-info "Generating wallpapers…"
+# Install accent-applier script (regenerates wallpapers + patches CSS)
+info "Installing accent applier…"
+sudo install -m 755 "$SCRIPT_DIR/scripts/apply-accent.sh" /usr/local/bin/tanyel-apply-accent
+ok "tanyel-apply-accent installed"
 
-WP_DIR="$HOME/.local/share/wallpapers/tanyel"
-mkdir -p "$WP_DIR"
-
-if command -v convert &>/dev/null; then
-  # Aurora — dark blue with teal/blue nebula
-  convert -size 1920x1080 gradient:'#1B2035-#141822' \
-    \( -size 1920x1080 xc:none -fill 'rgba(43,158,168,0.45)' -draw "circle 480,360 900,360" -blur 0x180 \) -compose over -composite \
-    \( -size 1920x1080 xc:none -fill 'rgba(91,143,255,0.30)' -draw "circle 1500,750 1900,750" -blur 0x180 \) -compose over -composite \
-    "$WP_DIR/aurora.jpg" 2>/dev/null && ok "  Aurora"
-
-  # Dusk — warm orange to deep purple
-  convert -size 1920x1080 gradient:'#6B3620-#1E1428' \
-    \( -size 1920x1080 xc:none -fill 'rgba(180,70,120,0.35)' -draw "circle 1200,540 1800,540" -blur 0x200 \) -compose over -composite \
-    "$WP_DIR/dusk.jpg" 2>/dev/null && ok "  Dusk"
-
-  # Grid — dark base with teal grid lines
-  convert -size 1920x1080 xc:'#141822' \
-    -stroke 'rgba(43,158,168,0.18)' -strokewidth 1 \
-    \( -size 1920x1080 xc:none $(for x in $(seq 0 48 1920); do echo -n "-draw \"line $x,0 $x,1080\" "; done) \) -compose over -composite \
-    "$WP_DIR/grid.jpg" 2>/dev/null || \
-    convert -size 1920x1080 xc:'#141822' \
-      \( -size 1920x1080 pattern:gray50 -negate -threshold 50% \) -compose over -composite \
-      -fill '#1B2D3A' -opaque white "$WP_DIR/grid.jpg" 2>/dev/null
-  [[ -f "$WP_DIR/grid.jpg" ]] && ok "  Grid"
-
-  # Topo — concentric rings (topographic feel)
-  convert -size 1920x1080 xc:'#1E2530' \
-    \( -size 1920x1080 radial-gradient:'rgba(43,158,168,0.20)-transparent' \) -compose over -composite \
-    "$WP_DIR/topo.jpg" 2>/dev/null && ok "  Topo"
-
-  # Solid — plain dark slate
-  convert -size 1920x1080 xc:'#253040' "$WP_DIR/solid.jpg" 2>/dev/null && ok "  Solid"
-else
-  warn "ImageMagick missing — wallpapers not generated"
-fi
+# Generate all 5 wallpapers using the apply-accent script (default teal)
+info "Generating wallpapers (teal accent)…"
+/usr/local/bin/tanyel-apply-accent "#2B9EA8" 2>&1 | sed 's/^/  /' || warn "Wallpaper generation failed"
 
 # Install Tweaks app (custom GTK4 settings panel)
 info "Installing TanyelOS Tweaks app…"
