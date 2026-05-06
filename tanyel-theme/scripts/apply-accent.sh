@@ -33,7 +33,7 @@ mkdir -p "$WP_DIR"
 if command -v convert &>/dev/null; then
   echo "→ Regenerating wallpapers with accent $ACCENT…"
 
-  # Aurora — primary accent nebula on dark blue base
+  # Aurora — accent nebula on dark blue base
   convert -size 1920x1080 gradient:'#1B2035-#141822' \
     \( -size 1920x1080 xc:none -fill "$RGBA45" -draw "circle 480,360 900,360" -blur 0x180 \) -compose over -composite \
     \( -size 1920x1080 xc:none -fill 'rgba(91,143,255,0.30)' -draw "circle 1500,750 1900,750" -blur 0x180 \) -compose over -composite \
@@ -44,15 +44,24 @@ if command -v convert &>/dev/null; then
     \( -size 1920x1080 xc:none -fill "$RGBA30" -draw "circle 1200,540 1800,540" -blur 0x200 \) -compose over -composite \
     "$WP_DIR/dusk.jpg" 2>/dev/null || echo "  ! Dusk failed"
 
-  # Grid — accent-colored centered glow on dark
+  # Grid — actual grid lines on dark base
+  GRID_DRAW=""
+  for x in $(seq 0 60 1920); do GRID_DRAW+="line $x,0 $x,1080 "; done
+  for y in $(seq 0 60 1080); do GRID_DRAW+="line 0,$y 1920,$y "; done
   convert -size 1920x1080 xc:'#141822' \
+    -stroke "$ACCENT" -strokewidth 1 -fill none \
+    -draw "$GRID_DRAW" \
     \( -size 1920x1080 xc:none -fill "$RGBA20" -draw "circle 960,540 1500,540" -blur 0x200 \) -compose over -composite \
     "$WP_DIR/grid.jpg" 2>/dev/null || echo "  ! Grid failed"
 
-  # Topo — accent contour rings
+  # Topo — concentric contour rings
+  TOPO_DRAW="fill none "
+  for r in $(seq 80 70 1400); do
+    TOPO_DRAW+="circle 960,540 $((960+r)),540 "
+  done
   convert -size 1920x1080 xc:'#1E2530' \
-    \( -size 1920x1080 xc:none -fill "$RGBA20" -draw "circle 600,400 1100,400" -blur 0x150 \) -compose over -composite \
-    \( -size 1920x1080 xc:none -fill "$RGBA20" -draw "circle 1300,700 1700,700" -blur 0x150 \) -compose over -composite \
+    -stroke "$ACCENT" -strokewidth 1 -fill none \
+    -draw "$TOPO_DRAW" \
     "$WP_DIR/topo.jpg" 2>/dev/null || echo "  ! Topo failed"
 
   # Solid — slate with subtle accent vignette

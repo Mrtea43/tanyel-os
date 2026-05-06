@@ -239,6 +239,15 @@ do
   gnome-extensions enable "$uuid" 2>/dev/null || true
 done
 
+# Disable Ubuntu's default extensions that conflict with TanyelOS layout
+for uuid in \
+  "ubuntu-dock@ubuntu.com" \
+  "ding@rastersoft.com" \
+  "tiling-assistant@ubuntu.com"
+do
+  gnome-extensions disable "$uuid" 2>/dev/null || true
+done
+
 ok "Settings applied"
 
 # ── 7. Neofetch branding ──────────────────────────────────────
