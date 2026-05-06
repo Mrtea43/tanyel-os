@@ -58,14 +58,30 @@ mkdir -p "$EXT_DIR"
 install_extension() {
   local uuid="$1" name="$2"
   local ext_dir="$EXT_DIR/$uuid"
+  local local_zip="$SCRIPT_DIR/extensions/${uuid}.zip"
 
-  if [[ -d "$ext_dir" ]]; then
+  if [[ -d "$ext_dir" && -n "$(ls -A "$ext_dir" 2>/dev/null)" ]]; then
     ok "$name already installed"
     return 0
   fi
 
-  info "Fetching $name for GNOME $GNOME_VER…"
+  # Try local bundled zip first (most reliable)
+  if [[ -f "$local_zip" ]]; then
+    info "Installing $name from bundled zip…"
+    mkdir -p "$ext_dir"
+    unzip -qo "$local_zip" -d "$ext_dir" 2>/dev/null && {
+      # Compile schemas if present
+      if [[ -d "$ext_dir/schemas" ]]; then
+        glib-compile-schemas "$ext_dir/schemas/" 2>/dev/null || true
+      fi
+      ok "$name installed (bundled)"
+      return 0
+    }
+    warn "$name: bundled zip extraction failed"
+  fi
 
+  # Fallback: GNOME extensions API
+  info "Fetching $name for GNOME $GNOME_VER from extensions.gnome.org…"
   local download_url
   download_url=$(curl -fsSL \
     "https://extensions.gnome.org/extension-info/?uuid=${uuid}&shell_version=${GNOME_VER}" \
@@ -74,8 +90,7 @@ install_extension() {
     2>/dev/null) || download_url=""
 
   if [[ -z "$download_url" ]]; then
-    warn "$name: no compatible version for GNOME $GNOME_VER — install manually"
-    warn "  → https://extensions.gnome.org/?q=$(echo "$name" | tr ' ' '+')"
+    warn "$name: install manually → https://extensions.gnome.org/?q=$(echo "$name" | tr ' ' '+')"
     return 0
   fi
 
@@ -85,20 +100,23 @@ install_extension() {
   }
 
   mkdir -p "$ext_dir"
-  unzip -q "/tmp/${uuid}.zip" -d "$ext_dir" 2>/dev/null || {
+  unzip -qo "/tmp/${uuid}.zip" -d "$ext_dir" 2>/dev/null || {
     warn "$name: extraction failed"
     rm -rf "$ext_dir"
     return 0
   }
+  if [[ -d "$ext_dir/schemas" ]]; then
+    glib-compile-schemas "$ext_dir/schemas/" 2>/dev/null || true
+  fi
   rm -f "/tmp/${uuid}.zip"
   ok "$name installed"
 }
 
-install_extension "dash-to-panel@jderose9.github.com"                        "Dash to Panel"
-install_extension "arcmenu@arcmenu.com"                                       "ArcMenu"
-install_extension "blur-my-shell@aunetx"                                      "Blur my Shell"
-install_extension "user-theme@gnome-shell-extensions.gcampax.github.com"     "User Themes"
-install_extension "just-perfection-desktop@just-perfection"                   "Just Perfection"
+install_extension "dash-to-panel@jderose9.github.com"                       "Dash to Panel"
+install_extension "arcmenu@arcmenu.com"                                      "ArcMenu"
+install_extension "blur-my-shell@aunetx"                                     "Blur my Shell"
+install_extension "user-theme@gnome-shell-extensions.gcampax.github.com"    "User Themes"
+install_extension "just-perfection-desktop@just-perfection"                  "Just Perfection"
 
 # ── 3. GTK theme ──────────────────────────────────────────────
 step "3/6  GTK theme"
