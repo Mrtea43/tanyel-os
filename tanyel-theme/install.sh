@@ -194,14 +194,17 @@ step "6/6  Applying GNOME settings"
 
 WP_DIR="$HOME/.local/share/wallpapers/tanyel"
 
-# Install accent-applier script (regenerates wallpapers + patches CSS)
+# Install accent-applier scripts (instant change + background wallpaper regen)
 info "Installing accent applier…"
-sudo install -m 755 "$SCRIPT_DIR/scripts/apply-accent.sh" /usr/local/bin/tanyel-apply-accent
-ok "tanyel-apply-accent installed"
+sudo install -m 755 "$SCRIPT_DIR/scripts/apply-accent.sh"      /usr/local/bin/tanyel-apply-accent
+sudo install -m 755 "$SCRIPT_DIR/scripts/regen-wallpapers.sh"  /usr/local/bin/tanyel-regen-wallpapers
+ok "tanyel-apply-accent + tanyel-regen-wallpapers installed"
 
-# Generate all 5 wallpapers using the apply-accent script (default teal)
-info "Generating wallpapers (teal accent)…"
-/usr/local/bin/tanyel-apply-accent "#2B9EA8" 2>&1 | sed 's/^/  /' || warn "Wallpaper generation failed"
+# Pre-generate all 5 wallpapers at install time (synchronous)
+info "Pre-generating all 5 wallpapers…"
+/usr/local/bin/tanyel-regen-wallpapers "#2B9EA8" "" 2>&1 | sed 's/^/  /' || warn "Wallpaper generation failed"
+# Apply accent + set initial wallpaper
+/usr/local/bin/tanyel-apply-accent "#2B9EA8" 2>&1 | sed 's/^/  /' || true
 
 # Install Tweaks app (custom GTK4 settings panel)
 info "Installing TanyelOS Tweaks app…"

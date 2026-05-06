@@ -65,6 +65,7 @@ ok "GDM config removed"
 step "Removing Tweaks app"
 sudo rm -f /usr/local/bin/tanyel-tweaks
 sudo rm -f /usr/local/bin/tanyel-apply-accent
+sudo rm -f /usr/local/bin/tanyel-regen-wallpapers
 sudo rm -f /usr/share/applications/com.tanyelos.Tweaks.desktop
 ok "Tweaks app removed"
 
