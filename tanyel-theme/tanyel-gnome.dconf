@@ -34,8 +34,13 @@ switch-windows=['<Alt>Tab']
 switch-applications=['<Super>Tab']
 
 [org/gnome/shell]
-enabled-extensions=['dash-to-dock@micxgx.gmail.com', 'arcmenu@arcmenu.com', 'blur-my-shell@aunetx', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'just-perfection-desktop@just-perfection']
+enabled-extensions=['dash-to-dock@micxgx.gmail.com', 'arcmenu@arcmenu.com', 'blur-my-shell@aunetx', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'just-perfection-desktop@just-perfection', 'window-list@gnome-shell-extensions.gcampax.github.com']
 favorite-apps=['tanyelos-about.desktop', 'tanyelos-projects.desktop', 'org.gnome.Nautilus.desktop', 'tanyelos-resume.desktop', 'org.gnome.Terminal.desktop', 'tanyelos-contact.desktop', 'org.gnome.Settings.desktop']
+
+[org/gnome/shell/extensions/window-list]
+show-on-all-monitors=false
+display-all-workspaces=false
+grouping-mode='auto'
 
 [org/gnome/shell/extensions/user-theme]
 name='TanyelOS-Dark'
@@ -66,10 +71,13 @@ intellihide=false
 require-pressure-to-show=false
 
 [org/gnome/shell/extensions/arcmenu]
-# Start menu — matches .t-startmenu
+# Start menu — TanyelOS-branded button on the top panel.
 menu-button-position='Left'
-menu-button-appearance='Text'
-custom-menu-button-text='Start'
+menu-button-appearance='Icon_Text'
+custom-menu-button-text='TanyelOS'
+menu-button-icon='Custom_Icon'
+custom-menu-button-icon='/usr/share/plymouth/themes/tanyel/logo.png'
+custom-menu-button-icon-size=18.0
 menu-layout='Eleven'
 menu-width-adjustment=360
 search-entry-border-radius=(true, 8)

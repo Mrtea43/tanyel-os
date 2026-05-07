@@ -196,11 +196,12 @@ class TweaksWindow(Adw.ApplicationWindow):
     def _on_accent_toggled(self, btn, hex_):
         if not btn.get_active():
             return
-        # Spawn the accent applier — it handles CSS patching, wallpaper regen,
-        # and libadwaita accent. No theme-dance trick (caused session freezes).
+        # --no-wallpaper makes accent change feel instant: CSS + libadwaita
+        # + Yaru icon-theme update in <100ms; user can pick a wallpaper
+        # in the dropdown below if they want it tinted too.
         try:
             subprocess.Popen(
-                ['/usr/local/bin/tanyel-apply-accent', hex_],
+                ['/usr/local/bin/tanyel-apply-accent', hex_, '--no-wallpaper'],
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                 start_new_session=True,
             )

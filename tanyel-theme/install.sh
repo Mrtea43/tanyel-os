@@ -143,6 +143,7 @@ install_extension "arcmenu@arcmenu.com"                                      "Ar
 install_extension "blur-my-shell@aunetx"                                     "Blur my Shell"
 install_extension "user-theme@gnome-shell-extensions.gcampax.github.com"    "User Themes"
 install_extension "just-perfection-desktop@just-perfection"                  "Just Perfection"
+install_extension "window-list@gnome-shell-extensions.gcampax.github.com"   "Window List"
 
 # ── 3. Build TanyelOS-Light + TanyelOS-Dark theme variants ───────
 step "3/6  Building light and dark theme variants"
@@ -376,7 +377,8 @@ for uuid in \
   "arcmenu@arcmenu.com" \
   "blur-my-shell@aunetx" \
   "user-theme@gnome-shell-extensions.gcampax.github.com" \
-  "just-perfection-desktop@just-perfection"
+  "just-perfection-desktop@just-perfection" \
+  "window-list@gnome-shell-extensions.gcampax.github.com"
 do
   gnome-extensions enable "$uuid" 2>/dev/null || true
 done

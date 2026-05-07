@@ -423,5 +423,65 @@ infobar {
   padding: 8px 14px;
 }
 
+/* ── Selection (Nautilus rows, list highlights) — tracks accent ─── */
+@define-color theme_selected_bg_color @accent;
+@define-color theme_selected_fg_color #FFFFFF;
+@define-color accent_bg_color @accent;
+@define-color accent_fg_color #FFFFFF;
+
+/* ── macOS-style traffic-light window controls ──────────────────── */
+windowcontrols {
+  margin: 0 4px;
+}
+windowcontrols button {
+  background-image: none;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  min-width: 12px;
+  min-height: 12px;
+  margin: 0 4px;
+  padding: 0;
+  border-radius: 999px;
+}
+windowcontrols button image {
+  opacity: 0;
+  -gtk-icon-size: 8px;
+  color: rgba(20, 20, 20, 0.6);
+}
+windowcontrols button.close {
+  background-color: @c_close;
+}
+windowcontrols button.minimize {
+  background-color: @c_min;
+}
+windowcontrols button.maximize {
+  background-color: @c_max;
+}
+windowcontrols button:hover {
+  filter: brightness(1.05);
+}
+windowcontrols button:hover image {
+  opacity: 0.55;
+}
+windowcontrols button:active {
+  filter: brightness(0.85);
+}
+
+/* ── Headerbar tweaks to match the design's dark rounded window ─── */
+headerbar,
+.titlebar {
+  background-color: @bg_2;
+  border-bottom: 0.5px solid @line;
+  min-height: 36px;
+  padding: 0 8px;
+}
+headerbar windowtitle,
+.titlebar windowtitle {
+  font-weight: 600;
+  font-size: 13px;
+  color: @fg_0;
+}
+
 /* Light/Dark variants are built as separate /usr/share/themes/TanyelOS-{Light,Dark}/
    directories by install.sh substituting the sentinel tokens above. */

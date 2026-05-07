@@ -380,3 +380,54 @@
   border-radius: 4px;
 }
 
+/* ── Window List — bottom panel ──────────────────────────────── */
+#panel.window-list,
+#window-list {
+  background-color: rgba(27, 31, 42, 0.85);
+  border-top: 0.5px solid rgba(58, 63, 82, 0.8);
+  height: 36px;
+}
+
+.window-list,
+.window-list-box {
+  background: transparent;
+  spacing: 4px;
+  padding: 4px 8px;
+}
+
+.window-list .window-button,
+.window-list-window-button {
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  margin: 2px;
+  padding: 0 10px;
+  color: #F5F3EF;
+  font-size: 12px;
+  min-height: 26px;
+}
+
+.window-list .window-button:hover,
+.window-list-window-button:hover {
+  background-color: rgba(245, 243, 239, 0.08);
+}
+
+.window-list .window-button.focused,
+.window-list-window-button.focused {
+  background-color: rgba(43, 158, 168, 0.20);
+}
+
+.window-list .clock,
+#window-list .clock {
+  font-variant-numeric: tabular-nums;
+  color: #F5F3EF;
+  font-size: 12px;
+  padding: 0 12px;
+}
+
+.window-list .workspace-indicator {
+  color: #F5F3EF;
+  font-size: 11px;
+  padding: 0 8px;
+}
+
