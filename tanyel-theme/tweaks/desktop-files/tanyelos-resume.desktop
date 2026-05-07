@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=resume.pdf
+GenericName=Resume document
+Comment=Open resume.pdf
+Exec=sh -c "xdg-open \\$HOME/Documents/resume.pdf"
+Icon=application-pdf
+Terminal=false
+Type=Application
+Categories=Office;
+Keywords=resume;pdf;document;
+StartupNotify=true

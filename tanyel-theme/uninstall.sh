@@ -17,12 +17,13 @@ echo "This will remove the TanyelOS theme and restore Ubuntu defaults."
 read -rp "Continue? [y/N] " confirm
 [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Cancelled."; exit 0; }
 
-# ── 1. GTK theme ──────────────────────────────────────────────
-step "Removing GTK theme"
-rm -rf "$HOME/.local/share/themes/TanyelOS"
+# ── 1. GTK theme variants ─────────────────────────────────────
+step "Removing GTK theme variants"
+sudo rm -rf /usr/share/themes/TanyelOS-Light /usr/share/themes/TanyelOS-Dark /usr/share/themes/TanyelOS
+rm -rf "$HOME/.local/share/themes/TanyelOS-Light" "$HOME/.local/share/themes/TanyelOS-Dark" "$HOME/.local/share/themes/TanyelOS"
 rm -f  "$HOME/.config/gtk-4.0/gtk.css"
 rm -f  "$HOME/.config/gtk-3.0/gtk.css"
-ok "GTK theme removed"
+ok "GTK theme variants removed"
 
 # ── 2. Wallpapers ─────────────────────────────────────────────
 step "Removing wallpapers"
@@ -61,13 +62,17 @@ sudo rm -f /etc/gdm3/greeter.dconf-defaults
 sudo rm -f /usr/share/gnome-shell/theme/tanyel-gdm.css
 ok "GDM config removed"
 
-# ── 7. Tweaks app ─────────────────────────────────────────────
-step "Removing Tweaks app"
+# ── 7. Tweaks app + dock launchers ────────────────────────────
+step "Removing Tweaks app + dock launchers"
 sudo rm -f /usr/local/bin/tanyel-tweaks
 sudo rm -f /usr/local/bin/tanyel-apply-accent
 sudo rm -f /usr/local/bin/tanyel-regen-wallpapers
 sudo rm -f /usr/share/applications/com.tanyelos.Tweaks.desktop
-ok "Tweaks app removed"
+sudo rm -f /usr/share/applications/tanyelos-about.desktop
+sudo rm -f /usr/share/applications/tanyelos-projects.desktop
+sudo rm -f /usr/share/applications/tanyelos-resume.desktop
+sudo rm -f /usr/share/applications/tanyelos-contact.desktop
+ok "Tweaks app + dock launchers removed"
 
 # ── 8. Neofetch config ────────────────────────────────────────
 step "Removing neofetch config"

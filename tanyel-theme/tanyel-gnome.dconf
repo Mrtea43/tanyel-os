@@ -3,12 +3,12 @@
 # Or via: gsettings set ...
 
 [org/gnome/desktop/interface]
-gtk-theme='TanyelOS'
-icon-theme='TanyelOS'
+gtk-theme='TanyelOS-Dark'
+icon-theme='Yaru-teal-dark'
 cursor-theme='Adwaita'
-font-name='Geist 10'
-monospace-font-name='JetBrains Mono 10'
-document-font-name='Geist 10'
+font-name='Geist 11'
+monospace-font-name='JetBrains Mono 11'
+document-font-name='Geist 11'
 color-scheme='prefer-dark'
 accent-color='teal'
 enable-animations=true
@@ -22,8 +22,8 @@ color-shading-type='vertical'
 
 [org/gnome/desktop/wm/preferences]
 button-layout='close,minimize,maximize:'
-theme='TanyelOS'
-titlebar-font='Geist Semi-Bold 10'
+theme='TanyelOS-Dark'
+titlebar-font='Geist Semi-Bold 11'
 num-workspaces=4
 action-double-click-titlebar='toggle-maximize'
 action-middle-click-titlebar='minimize'
@@ -35,16 +35,19 @@ switch-applications=['<Super>Tab']
 
 [org/gnome/shell]
 enabled-extensions=['dash-to-panel@jderose9.github.com', 'arcmenu@arcmenu.com', 'blur-my-shell@aunetx', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'just-perfection-desktop@just-perfection']
-favorite-apps=['org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'firefox.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Settings.desktop']
+favorite-apps=['tanyelos-about.desktop', 'tanyelos-projects.desktop', 'org.gnome.Nautilus.desktop', 'tanyelos-resume.desktop', 'org.gnome.Terminal.desktop', 'tanyelos-contact.desktop', 'org.gnome.Settings.desktop']
 
 [org/gnome/shell/extensions/user-theme]
-name='TanyelOS'
+name='TanyelOS-Dark'
 
 [org/gnome/shell/extensions/dash-to-panel]
-# Taskbar at the bottom, 48px tall — matches .t-taskbar
-panel-positions='{"0":"BOTTOM"}'
-panel-sizes='{"0":48}'
-panel-element-positions='{"0":[{"element":"showAppsButton","visible":true,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}]}'
+# 3-panel layout: TOP branding, LEFT vertical dock, BOTTOM minimal Start+clock
+panel-positions='{"0":"TOP","1":"LEFT","2":"BOTTOM"}'
+panel-sizes='{"0":28,"1":56,"2":36}'
+panel-anchors='{"0":"MIDDLE","1":"MIDDLE","2":"MIDDLE"}'
+panel-lengths='{"0":100,"1":100,"2":100}'
+panel-element-positions='{"0":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":false,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}],"1":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":false,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":false,"position":"stackedBR"},{"element":"systemMenu","visible":false,"position":"stackedBR"},{"element":"dateMenu","visible":false,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}],"2":[{"element":"showAppsButton","visible":true,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":false,"position":"stackedTL"},{"element":"taskbar","visible":false,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":false,"position":"stackedBR"},{"element":"systemMenu","visible":false,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}]}'
+multi-monitors=false
 dot-style-focused='METRO'
 dot-style-unfocused='DOTS'
 dot-color-dominant=false

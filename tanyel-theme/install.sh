@@ -144,41 +144,113 @@ install_extension "blur-my-shell@aunetx"                                     "Bl
 install_extension "user-theme@gnome-shell-extensions.gcampax.github.com"    "User Themes"
 install_extension "just-perfection-desktop@just-perfection"                  "Just Perfection"
 
-# ── 3. GTK theme ──────────────────────────────────────────────
-step "3/6  GTK theme"
+# ── 3. Build TanyelOS-Light + TanyelOS-Dark theme variants ───────
+step "3/6  Building light and dark theme variants"
 
-THEME_DIR="$HOME/.local/share/themes/TanyelOS"
-mkdir -p "$THEME_DIR/gtk-4.0" "$THEME_DIR/gtk-3.0" "$THEME_DIR/gnome-shell"
+# Sentinel-token sed expressions for each variant
+DARK_GTK_SED='
+s|/\*BG0\*/[^/]*/\*ENDBG0\*/|#252935|g
+s|/\*BG1\*/[^/]*/\*ENDBG1\*/|#2C3141|g
+s|/\*BG2\*/[^/]*/\*ENDBG2\*/|#1B1F2A|g
+s|/\*FG0\*/[^/]*/\*ENDFG0\*/|#F5F3EF|g
+s|/\*FG1\*/[^/]*/\*ENDFG1\*/|#C7C2BB|g
+s|/\*FG2\*/[^/]*/\*ENDFG2\*/|#948E88|g
+s|/\*LINE\*/[^/]*/\*ENDLINE\*/|#3A3F52|g
+s|/\*LINESOFT\*/[^/]*/\*ENDLINESOFT\*/|#323749|g
+s|/\*ACCENTSOFT\*/[^/]*/\*ENDACCENTSOFT\*/|#1A3B42|g
+'
+LIGHT_GTK_SED='
+s|/\*BG0\*/[^/]*/\*ENDBG0\*/|#FDFCFB|g
+s|/\*BG1\*/[^/]*/\*ENDBG1\*/|#F5F2EC|g
+s|/\*BG2\*/[^/]*/\*ENDBG2\*/|#EDEAE4|g
+s|/\*FG0\*/[^/]*/\*ENDFG0\*/|#312E29|g
+s|/\*FG1\*/[^/]*/\*ENDFG1\*/|#635E57|g
+s|/\*FG2\*/[^/]*/\*ENDFG2\*/|#9B9590|g
+s|/\*LINE\*/[^/]*/\*ENDLINE\*/|#D8D4CF|g
+s|/\*LINESOFT\*/[^/]*/\*ENDLINESOFT\*/|#E5E1DC|g
+s|/\*ACCENTSOFT\*/[^/]*/\*ENDACCENTSOFT\*/|#DCF0F2|g
+'
 
-cp "$SCRIPT_DIR/gtk-4.0/gtk.css" "$THEME_DIR/gtk-4.0/gtk.css"
-cp "$SCRIPT_DIR/gtk-3.0/gtk.css" "$THEME_DIR/gtk-3.0/gtk.css"
+build_gtk_variant() {
+  local variant="$1" src="$2" dest="$3"
+  local sed_script
+  if [[ "$variant" == "DARK" ]]; then sed_script="$DARK_GTK_SED"; else sed_script="$LIGHT_GTK_SED"; fi
+  sed "$sed_script" "$src" | sudo tee "$dest" > /dev/null
+}
 
-mkdir -p "$HOME/.config/gtk-4.0" "$HOME/.config/gtk-3.0"
-cp "$SCRIPT_DIR/gtk-4.0/gtk.css" "$HOME/.config/gtk-4.0/gtk.css"
-cp "$SCRIPT_DIR/gtk-3.0/gtk.css" "$HOME/.config/gtk-3.0/gtk.css"
+# Shell CSS color flip for light variant (two-pass to avoid conflicts)
+build_shell_variant() {
+  local variant="$1" src="$2" dest="$3"
+  if [[ "$variant" == "DARK" ]]; then
+    sudo cp "$src" "$dest"
+    return
+  fi
+  # Light variant: invert dark colors → light, and light states → dark equivalents
+  sed \
+    -e 's/rgba(27, *31, *42,/__P1__/g' \
+    -e 's/rgba(37, *41, *53,/__P2__/g' \
+    -e 's/rgba(58, *63, *82,/__P3__/g' \
+    -e 's/rgba(44, *49, *65,/__P4__/g' \
+    -e 's/rgba(245, *243, *239,/__P5__/g' \
+    -e 's/rgba(253, *252, *251,/__P6__/g' \
+    -e 's/rgba(216, *212, *207,/__P7__/g' \
+    -e 's/color: *#F5F3EF/__C1__/g' \
+    -e 's/color: *#FFFFFF/__C2__/g' \
+    -e 's/color: *#C7C2BB/__C3__/g' \
+    -e 's/color: *#312E29/__C4__/g' \
+    -e 's/color: *#635E57/__C5__/g' \
+    -e 's/border: *0\.5px solid *#3A3F52/__B1__/g' \
+    "$src" | \
+  sed \
+    -e 's|__P1__|rgba(253, 252, 251,|g' \
+    -e 's|__P2__|rgba(245, 243, 239,|g' \
+    -e 's|__P3__|rgba(216, 212, 207,|g' \
+    -e 's|__P4__|rgba(237, 234, 229,|g' \
+    -e 's|__P5__|rgba(49, 46, 41,|g' \
+    -e 's|__P6__|rgba(253, 252, 251,|g' \
+    -e 's|__P7__|rgba(216, 212, 207,|g' \
+    -e 's|__C1__|color: #312E29|g' \
+    -e 's|__C2__|color: #312E29|g' \
+    -e 's|__C3__|color: #635E57|g' \
+    -e 's|__C4__|color: #312E29|g' \
+    -e 's|__C5__|color: #635E57|g' \
+    -e 's|__B1__|border: 0.5px solid #D8D4CF|g' \
+    | sudo tee "$dest" > /dev/null
+}
 
-cat > "$THEME_DIR/index.theme" <<'EOF'
+for variant in DARK LIGHT; do
+  variant_name="$([ "$variant" = "DARK" ] && echo "Dark" || echo "Light")"
+  theme_dir="/usr/share/themes/TanyelOS-${variant_name}"
+  info "Building TanyelOS-${variant_name}…"
+
+  sudo mkdir -p "${theme_dir}/gtk-3.0" "${theme_dir}/gtk-4.0" "${theme_dir}/gnome-shell"
+
+  build_gtk_variant "${variant}" "$SCRIPT_DIR/gtk-4.0/gtk.css" "${theme_dir}/gtk-4.0/gtk.css"
+  build_gtk_variant "${variant}" "$SCRIPT_DIR/gtk-3.0/gtk.css" "${theme_dir}/gtk-3.0/gtk.css"
+  build_shell_variant "${variant}" "$SCRIPT_DIR/gnome-shell/gnome-shell.css" "${theme_dir}/gnome-shell/gnome-shell.css"
+
+  sudo tee "${theme_dir}/index.theme" > /dev/null <<EOF
 [Desktop Entry]
 Type=X-GNOME-Metatheme
-Name=TanyelOS
-Comment=TanyelOS desktop theme
+Name=TanyelOS-${variant_name}
+Comment=TanyelOS desktop theme — ${variant_name}
 Encoding=UTF-8
 
 [X-GNOME-Metatheme]
-GtkTheme=TanyelOS
-MetacityTheme=TanyelOS
+GtkTheme=TanyelOS-${variant_name}
+MetacityTheme=TanyelOS-${variant_name}
 IconTheme=Yaru-teal-dark
 CursorTheme=Adwaita
 ButtonLayout=close,minimize,maximize:
 EOF
+  ok "  TanyelOS-${variant_name} installed to ${theme_dir}"
+done
 
-ok "GTK theme installed"
-
-# ── 4. GNOME Shell theme ──────────────────────────────────────
-step "4/6  GNOME Shell theme"
-
-cp "$SCRIPT_DIR/gnome-shell/gnome-shell.css" "$THEME_DIR/gnome-shell/gnome-shell.css"
-ok "GNOME Shell theme installed"
+# Also install user-level gtk.css (per-user override) — use Dark variant by default
+mkdir -p "$HOME/.config/gtk-4.0" "$HOME/.config/gtk-3.0"
+sudo cp "/usr/share/themes/TanyelOS-Dark/gtk-4.0/gtk.css" "$HOME/.config/gtk-4.0/gtk.css" 2>/dev/null || \
+  build_gtk_variant "DARK" "$SCRIPT_DIR/gtk-4.0/gtk.css" "$HOME/.config/gtk-4.0/gtk.css"
+sudo chown "$USER:$USER" "$HOME/.config/gtk-4.0/gtk.css" 2>/dev/null || true
 
 # ── 5. Plymouth boot theme ────────────────────────────────────
 step "5/6  Plymouth boot theme"
@@ -258,21 +330,35 @@ sudo apt-get install -y --no-install-recommends \
 
 sudo install -m 755 "$SCRIPT_DIR/tweaks/tanyel-tweaks.py" /usr/local/bin/tanyel-tweaks
 sudo install -m 644 "$SCRIPT_DIR/tweaks/com.tanyelos.Tweaks.desktop" /usr/share/applications/com.tanyelos.Tweaks.desktop
+
+# Install custom desktop launchers (About / Projects / resume.pdf / Contact) for the dock
+info "Installing dock launchers…"
+for launcher in "$SCRIPT_DIR"/tweaks/desktop-files/*.desktop; do
+  [[ -f "$launcher" ]] && sudo install -m 644 "$launcher" "/usr/share/applications/$(basename "$launcher")"
+done
+
+# Create placeholder folders/files referenced by launchers
+mkdir -p "$HOME/Projects" "$HOME/Documents"
+[[ ! -f "$HOME/Documents/resume.pdf" ]] && touch "$HOME/Documents/resume.pdf"
+
 update-desktop-database ~/.local/share/applications 2>/dev/null || true
-ok "Tweaks app installed (search for 'TanyelOS Tweaks' in apps)"
+update-desktop-database /usr/share/applications 2>/dev/null || true
+ok "Tweaks app + dock launchers installed"
 
 # Apply dconf system defaults
 dconf load / < "$SCRIPT_DIR/tanyel-gnome.dconf"
 
 # Force key settings via gsettings (takes effect immediately)
-gsettings set org.gnome.desktop.interface gtk-theme 'TanyelOS' 2>/dev/null || true
+gsettings set org.gnome.desktop.interface gtk-theme 'TanyelOS-Dark' 2>/dev/null || true
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
 gsettings set org.gnome.desktop.interface monospace-font-name 'JetBrains Mono 11' 2>/dev/null || true
 gsettings set org.gnome.desktop.wm.preferences button-layout 'close,minimize,maximize:' 2>/dev/null || true
+gsettings set org.gnome.shell.extensions.user-theme name 'TanyelOS-Dark' 2>/dev/null || true
 
-if [[ -f "$WP_DIR/aurora.jpg" ]]; then
-  gsettings set org.gnome.desktop.background picture-uri "file://$WP_DIR/aurora.jpg" 2>/dev/null || true
-  gsettings set org.gnome.desktop.background picture-uri-dark "file://$WP_DIR/aurora.jpg" 2>/dev/null || true
+# Set wallpaper to dark variants by default; light variants used when color-scheme=default
+if [[ -f "$WP_DIR/aurora-dark.jpg" ]]; then
+  gsettings set org.gnome.desktop.background picture-uri "file://$WP_DIR/aurora-light.jpg" 2>/dev/null || true
+  gsettings set org.gnome.desktop.background picture-uri-dark "file://$WP_DIR/aurora-dark.jpg" 2>/dev/null || true
   gsettings set org.gnome.desktop.background picture-options 'zoom' 2>/dev/null || true
 fi
 

@@ -1,218 +1,298 @@
 #!/usr/bin/env python3
-"""TanyelOS Tweaks — apply theme, accent color, font, and wallpaper settings."""
+"""TanyelOS Tweaks — compact floating panel for theme, accent, font, and wallpaper."""
 
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gtk, Gio, Adw, GLib
+from gi.repository import Gtk, Gio, Adw, Gdk, GLib
 
 import os
 import subprocess
 
 WALLPAPER_DIR = os.path.expanduser('~/.local/share/wallpapers/tanyel')
 
-WALLPAPERS = [
-    ('aurora', 'Aurora', 'Dark blue with teal nebula'),
-    ('dusk',   'Dusk',   'Warm orange to deep purple'),
-    ('grid',   'Grid',   'Clean lines on dark base'),
-    ('topo',   'Topo',   'Topographic contour rings'),
-    ('solid',  'Solid',  'Plain dark slate'),
-]
+WALLPAPERS = ['aurora', 'dusk', 'grid', 'topo', 'solid']
 
 ACCENTS = [
-    ('teal',   '#2B9EA8', 'Teal'),
-    ('amber',  '#D4A843', 'Amber'),
-    ('rose',   '#E05C4A', 'Rose'),
-    ('violet', '#8B6FC2', 'Violet'),
-    ('lime',   '#5DB348', 'Lime'),
+    ('teal',   '#2B9EA8'),
+    ('amber',  '#D4A843'),
+    ('rose',   '#E05C4A'),
+    ('violet', '#8B6FC2'),
+    ('lime',   '#5DB348'),
 ]
 
-FONTS = ['Geist', 'Inter', 'Cantarell', 'Ubuntu', 'JetBrains Mono', 'Roboto']
+FONTS = ['Geist', 'Inter', 'IBM Plex Sans', 'JetBrains Mono', 'Cantarell', 'Ubuntu']
+
+PANEL_CSS = """
+.t-tweaks-panel {
+  background: alpha(@theme_bg_color, 0.96);
+  border-radius: 14px;
+  border: 0.5px solid alpha(@borders, 0.8);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.06),
+    0 8px 24px rgba(0,0,0,0.16);
+  padding: 0;
+}
+
+.t-tweaks-titlebar {
+  padding: 12px 14px 6px 16px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.t-tweaks-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: alpha(@theme_fg_color, 0.55);
+  margin: 12px 16px 8px 16px;
+}
+
+.t-tweaks-row {
+  padding: 6px 16px;
+}
+
+.t-tweaks-row label.title {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.t-close {
+  min-width: 24px;
+  min-height: 24px;
+  padding: 2px;
+  border-radius: 999px;
+  background: transparent;
+  border: none;
+}
+.t-close:hover {
+  background: alpha(@theme_fg_color, 0.08);
+}
+
+button.t-seg {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  min-height: 24px;
+}
+button.t-seg:checked {
+  background: @theme_bg_color;
+  color: @theme_fg_color;
+  font-weight: 600;
+}
+"""
 
 
-class TweaksWindow(Adw.ApplicationWindow):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.set_title('TanyelOS Tweaks')
-        self.set_default_size(440, 640)
+class TweaksWindow(Gtk.Window):
+    def __init__(self, app):
+        super().__init__(application=app)
+        self.set_title('Tweaks')
+        self.set_decorated(False)
+        self.set_default_size(300, 360)
+        self.set_resizable(False)
+        self.add_css_class('t-tweaks-panel')
 
         self.iface = Gio.Settings.new('org.gnome.desktop.interface')
         self.bg = Gio.Settings.new('org.gnome.desktop.background')
 
-        toolbar_view = Adw.ToolbarView()
-        header = Adw.HeaderBar()
-        toolbar_view.add_top_bar(header)
+        self._load_css()
 
-        scrolled = Gtk.ScrolledWindow()
-        scrolled.set_vexpand(True)
+        # Outer container
+        outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        self.set_child(outer)
 
-        clamp = Adw.Clamp()
-        clamp.set_maximum_size(400)
-        clamp.set_margin_top(24)
-        clamp.set_margin_bottom(24)
-        clamp.set_margin_start(16)
-        clamp.set_margin_end(16)
+        # Custom titlebar
+        titlebar = Gtk.WindowHandle()
+        title_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+        title_box.add_css_class('t-tweaks-titlebar')
+        title_label = Gtk.Label(label='Tweaks', xalign=0, hexpand=True)
+        title_label.add_css_class('title')
+        close_btn = Gtk.Button(icon_name='window-close-symbolic')
+        close_btn.add_css_class('t-close')
+        close_btn.connect('clicked', lambda _: self.close())
+        title_box.append(title_label)
+        title_box.append(close_btn)
+        titlebar.set_child(title_box)
+        outer.append(titlebar)
 
-        page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=24)
+        # APPEARANCE section
+        outer.append(self._section_label('APPEARANCE'))
+        outer.append(self._row('Theme', self._build_theme_toggle()))
+        outer.append(self._row('Accent', self._build_accent_segments()))
+        outer.append(self._row('Font', self._build_font_dropdown()))
 
-        page.append(self._build_appearance_section())
-        page.append(self._build_desktop_section())
-        page.append(self._build_about_section())
+        # DESKTOP section
+        outer.append(self._section_label('DESKTOP'))
+        outer.append(self._row('Wallpaper', self._build_wallpaper_dropdown()))
 
-        clamp.set_child(page)
-        scrolled.set_child(clamp)
-        toolbar_view.set_content(scrolled)
-        self.set_content(toolbar_view)
+        # bottom padding
+        spacer = Gtk.Box()
+        spacer.set_size_request(0, 12)
+        outer.append(spacer)
 
-    def _build_appearance_section(self):
-        group = Adw.PreferencesGroup()
-        group.set_title('Appearance')
+    def _load_css(self):
+        provider = Gtk.CssProvider()
+        provider.load_from_data(PANEL_CSS.encode())
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(),
+            provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
 
-        # Theme row (dark/light toggle)
-        theme_row = Adw.ActionRow()
-        theme_row.set_title('Theme')
-        theme_row.set_subtitle('Affects system menus and apps. Shell stays dark by design.')
+    def _section_label(self, text):
+        lbl = Gtk.Label(label=text, xalign=0)
+        lbl.add_css_class('t-tweaks-section-label')
+        return lbl
 
-        theme_box = Gtk.Box(spacing=0, css_classes=['linked'])
-        theme_box.set_valign(Gtk.Align.CENTER)
-        light_btn = Gtk.ToggleButton(label='Light')
-        dark_btn  = Gtk.ToggleButton(label='Dark')
+    def _row(self, title, control):
+        row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        row.add_css_class('t-tweaks-row')
+        title_lbl = Gtk.Label(label=title, xalign=0, hexpand=True)
+        title_lbl.add_css_class('title')
+        row.append(title_lbl)
+        row.append(control)
+        return row
+
+    # ── Theme toggle (Light/Dark segmented) ──────────────────────
+    def _build_theme_toggle(self):
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0,
+                      css_classes=['linked'])
+        box.set_valign(Gtk.Align.CENTER)
+        light_btn = Gtk.ToggleButton(label='light')
+        dark_btn = Gtk.ToggleButton(label='dark')
+        light_btn.add_css_class('t-seg')
+        dark_btn.add_css_class('t-seg')
         dark_btn.set_group(light_btn)
 
-        current_scheme = self.iface.get_string('color-scheme')
-        if 'dark' in current_scheme:
+        current = self.iface.get_string('color-scheme')
+        if 'dark' in current:
             dark_btn.set_active(True)
         else:
             light_btn.set_active(True)
 
-        light_btn.connect('toggled', lambda b: b.get_active() and self.iface.set_string('color-scheme', 'default'))
-        dark_btn.connect('toggled',  lambda b: b.get_active() and self.iface.set_string('color-scheme', 'prefer-dark'))
+        light_btn.connect('toggled', lambda b: b.get_active() and self._set_theme('light'))
+        dark_btn.connect('toggled', lambda b: b.get_active() and self._set_theme('dark'))
 
-        theme_box.append(light_btn)
-        theme_box.append(dark_btn)
-        theme_row.add_suffix(theme_box)
-        group.add(theme_row)
+        box.append(light_btn)
+        box.append(dark_btn)
+        return box
 
-        # Accent color row
-        accent_row = Adw.ActionRow()
-        accent_row.set_title('Accent color')
-        accent_row.set_subtitle('Highlight color for buttons and selections')
+    def _set_theme(self, mode):
+        if mode == 'dark':
+            self.iface.set_string('color-scheme', 'prefer-dark')
+            self.iface.set_string('gtk-theme', 'TanyelOS-Dark')
+            try:
+                Gio.Settings.new('org.gnome.shell.extensions.user-theme') \
+                    .set_string('name', 'TanyelOS-Dark')
+            except Exception:
+                pass
+        else:
+            self.iface.set_string('color-scheme', 'default')
+            self.iface.set_string('gtk-theme', 'TanyelOS-Light')
+            try:
+                Gio.Settings.new('org.gnome.shell.extensions.user-theme') \
+                    .set_string('name', 'TanyelOS-Light')
+            except Exception:
+                pass
+        # Re-apply current wallpaper variant
+        self._update_wallpaper_for_theme()
 
-        accent_dropdown = Gtk.DropDown.new_from_strings([a[2] for a in ACCENTS])
-        accent_dropdown.set_valign(Gtk.Align.CENTER)
-        # Restore saved accent
-        saved_accent = self._read_saved_accent()
-        for i, a in enumerate(ACCENTS):
-            if a[1].lower() == saved_accent.lower():
-                accent_dropdown.set_selected(i)
-                break
-        accent_dropdown.connect('notify::selected', self._on_accent_changed)
-        accent_row.add_suffix(accent_dropdown)
-        group.add(accent_row)
+    def _update_wallpaper_for_theme(self):
+        # Find current wallpaper base name (strip -dark/-light)
+        current = self.bg.get_string('picture-uri') or ''
+        for name in WALLPAPERS:
+            if name in current:
+                self._set_wallpaper(name)
+                return
+        self._set_wallpaper('aurora')
 
-        # Font row
-        font_row = Adw.ActionRow()
-        font_row.set_title('Interface font')
-        font_row.set_subtitle('Used for menus, labels, and apps')
+    # ── Accent segmented buttons ──────────────────────────────────
+    def _build_accent_segments(self):
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0,
+                      css_classes=['linked'])
+        box.set_valign(Gtk.Align.CENTER)
 
-        font_dropdown = Gtk.DropDown.new_from_strings(FONTS)
-        font_dropdown.set_valign(Gtk.Align.CENTER)
-        current_font = self.iface.get_string('font-name').rsplit(' ', 1)[0]
-        if current_font in FONTS:
-            font_dropdown.set_selected(FONTS.index(current_font))
-        font_dropdown.connect('notify::selected', self._on_font_changed)
-        font_row.add_suffix(font_dropdown)
-        group.add(font_row)
-
-        return group
-
-    def _build_desktop_section(self):
-        group = Adw.PreferencesGroup()
-        group.set_title('Desktop')
-
-        wp_row = Adw.ActionRow()
-        wp_row.set_title('Wallpaper')
-        wp_row.set_subtitle('Background image')
-
-        wp_dropdown = Gtk.DropDown.new_from_strings([w[1] for w in WALLPAPERS])
-        wp_dropdown.set_valign(Gtk.Align.CENTER)
-        wp_dropdown.connect('notify::selected', self._on_wallpaper_changed)
-        wp_row.add_suffix(wp_dropdown)
-        group.add(wp_row)
-
-        # Show current wallpaper preview info
-        info_row = Adw.ActionRow()
-        info_row.set_title('Storage location')
-        info_row.set_subtitle(WALLPAPER_DIR)
-        group.add(info_row)
-
-        return group
-
-    def _build_about_section(self):
-        group = Adw.PreferencesGroup()
-
-        about_row = Adw.ActionRow()
-        about_row.set_title('TanyelOS Tweaks')
-        about_row.set_subtitle('Version 1.0 · github.com/Mrtea43/tanyel-os')
-        group.add(about_row)
-
-        return group
-
-    def _on_accent_changed(self, dropdown, _):
-        accent = ACCENTS[dropdown.get_selected()]
-        # Run the apply-accent script that regenerates wallpapers + patches CSS
-        try:
-            result = subprocess.run(
-                ['/usr/local/bin/tanyel-apply-accent', accent[1]],
-                capture_output=True, text=True, timeout=30
-            )
-            if result.returncode == 0:
-                self._toast(f'Accent → {accent[2]} applied. Restart apps to see the change.')
-                # Trigger a CSS reload by toggling the GTK theme rapidly
-                try:
-                    subprocess.Popen(
-                        ['bash', '-c',
-                         'gsettings set org.gnome.desktop.interface gtk-theme "Adwaita"; '
-                         'sleep 0.1; '
-                         'gsettings set org.gnome.desktop.interface gtk-theme "TanyelOS"'],
-                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-                    )
-                except Exception:
-                    pass
+        saved = self._read_saved_accent()
+        first_btn = None
+        for i, (name, hex_) in enumerate(ACCENTS):
+            btn = Gtk.ToggleButton(label=name)
+            btn.add_css_class('t-seg')
+            if i == 0:
+                first_btn = btn
             else:
-                self._toast(f'Accent change error: {result.stderr.strip()[:100]}')
-        except FileNotFoundError:
-            self._toast('tanyel-apply-accent not found — run install.sh')
-        except subprocess.TimeoutExpired:
-            self._toast('Accent change timed out')
+                btn.set_group(first_btn)
+            if hex_.lower() == saved.lower():
+                btn.set_active(True)
+            btn.connect('toggled', self._on_accent_toggled, hex_, name)
+            box.append(btn)
+        return box
 
-    def _on_font_changed(self, dropdown, _):
-        font = FONTS[dropdown.get_selected()]
+    def _on_accent_toggled(self, btn, hex_, name):
+        if not btn.get_active():
+            return
+        try:
+            subprocess.Popen(
+                ['/usr/local/bin/tanyel-apply-accent', hex_],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
+            # Toggle theme to force GTK CSS reload in running apps
+            current_theme = self.iface.get_string('gtk-theme')
+            GLib.timeout_add(100, lambda: self.iface.set_string('gtk-theme', 'Adwaita') or False)
+            GLib.timeout_add(250, lambda: self.iface.set_string('gtk-theme', current_theme) or False)
+        except FileNotFoundError:
+            pass
+
+    # ── Font dropdown ────────────────────────────────────────────
+    def _build_font_dropdown(self):
+        dd = Gtk.DropDown.new_from_strings(FONTS)
+        dd.set_valign(Gtk.Align.CENTER)
+        current = self.iface.get_string('font-name').rsplit(' ', 1)[0]
+        if current in FONTS:
+            dd.set_selected(FONTS.index(current))
+        dd.connect('notify::selected', self._on_font_changed)
+        return dd
+
+    def _on_font_changed(self, dd, _):
+        font = FONTS[dd.get_selected()]
         self.iface.set_string('font-name', f'{font} 11')
-        if font == 'JetBrains Mono':
+        if 'Mono' in font:
             self.iface.set_string('monospace-font-name', f'{font} 11')
 
-    def _on_wallpaper_changed(self, dropdown, _):
-        wp_id = WALLPAPERS[dropdown.get_selected()][0]
-        wp_path = os.path.join(WALLPAPER_DIR, f'{wp_id}.jpg')
-        if os.path.exists(wp_path):
-            uri = f'file://{wp_path}'
-            self.bg.set_string('picture-uri', uri)
-            self.bg.set_string('picture-uri-dark', uri)
-            self.bg.set_string('picture-options', 'zoom')
-        else:
-            self._toast(f'Wallpaper not found: {wp_path}')
+    # ── Wallpaper dropdown ───────────────────────────────────────
+    def _build_wallpaper_dropdown(self):
+        dd = Gtk.DropDown.new_from_strings(WALLPAPERS)
+        dd.set_valign(Gtk.Align.CENTER)
+        # Restore current
+        current = self.bg.get_string('picture-uri') or ''
+        for i, name in enumerate(WALLPAPERS):
+            if name in current:
+                dd.set_selected(i)
+                break
+        dd.connect('notify::selected', self._on_wallpaper_changed)
+        return dd
 
+    def _on_wallpaper_changed(self, dd, _):
+        self._set_wallpaper(WALLPAPERS[dd.get_selected()])
+
+    def _set_wallpaper(self, name):
+        light_path = os.path.join(WALLPAPER_DIR, f'{name}-light.jpg')
+        dark_path = os.path.join(WALLPAPER_DIR, f'{name}-dark.jpg')
+        # Picture URI for light/dark color schemes
+        if os.path.exists(light_path):
+            self.bg.set_string('picture-uri', f'file://{light_path}')
+        elif os.path.exists(dark_path):
+            self.bg.set_string('picture-uri', f'file://{dark_path}')
+        if os.path.exists(dark_path):
+            self.bg.set_string('picture-uri-dark', f'file://{dark_path}')
+        self.bg.set_string('picture-options', 'zoom')
+
+    # ── Helpers ──────────────────────────────────────────────────
     def _read_saved_accent(self):
         try:
             with open(os.path.expanduser('~/.config/tanyelos/accent')) as f:
                 return f.read().strip()
         except (FileNotFoundError, OSError):
             return '#2B9EA8'
-
-    def _toast(self, msg):
-        # Simple stderr log; could wire up Adw.Toast for proper UI feedback
-        print(f'[Tweaks] {msg}')
 
 
 class TweaksApp(Adw.Application):
@@ -224,7 +304,7 @@ class TweaksApp(Adw.Application):
     def _on_activate(self, app):
         win = self.props.active_window
         if not win:
-            win = TweaksWindow(application=app)
+            win = TweaksWindow(app)
         win.present()
 
 

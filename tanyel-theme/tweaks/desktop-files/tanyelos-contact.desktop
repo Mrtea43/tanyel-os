@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Contact
+GenericName=Contact
+Comment=Open default email client
+Exec=xdg-open mailto:
+Icon=mail-message-new
+Terminal=false
+Type=Application
+Categories=Network;Email;
+Keywords=contact;email;mail;
+StartupNotify=true

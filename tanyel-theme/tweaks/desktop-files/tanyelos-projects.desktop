@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Projects
+GenericName=Projects folder
+Comment=Open the Projects folder
+Exec=sh -c "xdg-open \\$HOME/Projects"
+Icon=folder-development
+Terminal=false
+Type=Application
+Categories=Utility;
+Keywords=projects;folder;
+StartupNotify=true

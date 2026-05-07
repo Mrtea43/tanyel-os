@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=About
+GenericName=About TanyelOS
+Comment=Information about this TanyelOS install
+Exec=tanyel-tweaks
+Icon=help-about
+Terminal=false
+Type=Application
+Categories=System;
+Keywords=about;tanyelos;info;
+StartupNotify=true
