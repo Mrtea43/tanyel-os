@@ -39,6 +39,7 @@ ok "Custom fonts removed (system fonts kept)"
 # ── 4. GNOME extensions ───────────────────────────────────────
 step "Removing GNOME extensions"
 for uuid in \
+  "dash-to-dock@micxgx.gmail.com" \
   "dash-to-panel@jderose9.github.com" \
   "arcmenu@arcmenu.com" \
   "blur-my-shell@aunetx" \
@@ -72,7 +73,12 @@ sudo rm -f /usr/share/applications/tanyelos-about.desktop
 sudo rm -f /usr/share/applications/tanyelos-projects.desktop
 sudo rm -f /usr/share/applications/tanyelos-resume.desktop
 sudo rm -f /usr/share/applications/tanyelos-contact.desktop
-ok "Tweaks app + dock launchers removed"
+sudo rm -f /usr/share/icons/hicolor/scalable/apps/tanyelos-about.svg
+sudo rm -f /usr/share/icons/hicolor/scalable/apps/tanyelos-projects.svg
+sudo rm -f /usr/share/icons/hicolor/scalable/apps/tanyelos-resume.svg
+sudo rm -f /usr/share/icons/hicolor/scalable/apps/tanyelos-contact.svg
+sudo gtk-update-icon-cache -f /usr/share/icons/hicolor/ 2>/dev/null || true
+ok "Tweaks app + dock launchers + icons removed"
 
 # ── 8. Neofetch config ────────────────────────────────────────
 step "Removing neofetch config"

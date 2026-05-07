@@ -138,7 +138,7 @@ install_extension() {
   ok "$name installed"
 }
 
-install_extension "dash-to-panel@jderose9.github.com"                       "Dash to Panel"
+install_extension "dash-to-dock@micxgx.gmail.com"                            "Dash to Dock"
 install_extension "arcmenu@arcmenu.com"                                      "ArcMenu"
 install_extension "blur-my-shell@aunetx"                                     "Blur my Shell"
 install_extension "user-theme@gnome-shell-extensions.gcampax.github.com"    "User Themes"
@@ -337,13 +337,21 @@ for launcher in "$SCRIPT_DIR"/tweaks/desktop-files/*.desktop; do
   [[ -f "$launcher" ]] && sudo install -m 644 "$launcher" "/usr/share/applications/$(basename "$launcher")"
 done
 
+# Install custom SVG icons for the launchers (matches design's flat colored glyphs)
+if compgen -G "$SCRIPT_DIR/tweaks/icons/*.svg" > /dev/null; then
+  info "Installing custom dock icons…"
+  sudo install -dm755 /usr/share/icons/hicolor/scalable/apps
+  sudo install -m 644 "$SCRIPT_DIR"/tweaks/icons/*.svg /usr/share/icons/hicolor/scalable/apps/
+  sudo gtk-update-icon-cache -f /usr/share/icons/hicolor/ 2>/dev/null || true
+fi
+
 # Create placeholder folders/files referenced by launchers
 mkdir -p "$HOME/Projects" "$HOME/Documents"
 [[ ! -f "$HOME/Documents/resume.pdf" ]] && touch "$HOME/Documents/resume.pdf"
 
 update-desktop-database ~/.local/share/applications 2>/dev/null || true
 update-desktop-database /usr/share/applications 2>/dev/null || true
-ok "Tweaks app + dock launchers installed"
+ok "Tweaks app + dock launchers + icons installed"
 
 # Apply dconf system defaults
 dconf load / < "$SCRIPT_DIR/tanyel-gnome.dconf"
@@ -364,7 +372,7 @@ fi
 
 # Enable all extensions
 for uuid in \
-  "dash-to-panel@jderose9.github.com" \
+  "dash-to-dock@micxgx.gmail.com" \
   "arcmenu@arcmenu.com" \
   "blur-my-shell@aunetx" \
   "user-theme@gnome-shell-extensions.gcampax.github.com" \
@@ -373,11 +381,13 @@ do
   gnome-extensions enable "$uuid" 2>/dev/null || true
 done
 
-# Disable Ubuntu's default extensions that conflict with TanyelOS layout
+# Disable extensions that conflict with TanyelOS layout (Ubuntu's stock
+# dock + dash-to-panel, in case a previous TanyelOS install enabled it).
 for uuid in \
   "ubuntu-dock@ubuntu.com" \
   "ding@rastersoft.com" \
-  "tiling-assistant@ubuntu.com"
+  "tiling-assistant@ubuntu.com" \
+  "dash-to-panel@jderose9.github.com"
 do
   gnome-extensions disable "$uuid" 2>/dev/null || true
 done
