@@ -4,7 +4,7 @@
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gtk, Gio, Adw, Gdk, GLib
+from gi.repository import Gtk, Gio, Adw, Gdk
 
 import os
 import subprocess
@@ -23,121 +23,98 @@ ACCENTS = [
 
 FONTS = ['Geist', 'Inter', 'IBM Plex Sans', 'JetBrains Mono', 'Cantarell', 'Ubuntu']
 
-PANEL_CSS = """
-.t-tweaks-panel {
-  background: alpha(@theme_bg_color, 0.96);
-  border-radius: 14px;
-  border: 0.5px solid alpha(@borders, 0.8);
-  box-shadow:
-    0 1px 2px rgba(0,0,0,0.06),
-    0 8px 24px rgba(0,0,0,0.16);
-  padding: 0;
-}
-
+# Local CSS — scoped to the Tweaks window only via .t-tweaks-* classes.
+PANEL_CSS = b"""
 .t-tweaks-titlebar {
   padding: 12px 14px 6px 16px;
   font-weight: 600;
-  font-size: 14px;
 }
-
 .t-tweaks-section-label {
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  color: alpha(@theme_fg_color, 0.55);
-  margin: 12px 16px 8px 16px;
+  margin: 12px 16px 6px 16px;
+  opacity: 0.55;
 }
-
 .t-tweaks-row {
   padding: 6px 16px;
 }
-
-.t-tweaks-row label.title {
+.t-tweaks-row > label.title {
   font-size: 13px;
   font-weight: 500;
 }
-
-.t-close {
-  min-width: 24px;
-  min-height: 24px;
-  padding: 2px;
-  border-radius: 999px;
-  background: transparent;
-  border: none;
-}
-.t-close:hover {
-  background: alpha(@theme_fg_color, 0.08);
-}
-
 button.t-seg {
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 500;
   min-height: 24px;
 }
-button.t-seg:checked {
-  background: @theme_bg_color;
-  color: @theme_fg_color;
-  font-weight: 600;
-}
 """
 
 
-class TweaksWindow(Gtk.Window):
+def _safe(fn):
+    """Wrap a callback so an exception never crashes the app/session."""
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:
+            print(f'[tanyel-tweaks] {fn.__name__} error: {e}')
+    return wrapper
+
+
+class TweaksWindow(Adw.ApplicationWindow):
     def __init__(self, app):
         super().__init__(application=app)
         self.set_title('Tweaks')
-        self.set_decorated(False)
-        self.set_default_size(300, 360)
+        self.set_default_size(320, 380)
         self.set_resizable(False)
-        self.add_css_class('t-tweaks-panel')
 
         self.iface = Gio.Settings.new('org.gnome.desktop.interface')
         self.bg = Gio.Settings.new('org.gnome.desktop.background')
+        # user-theme schema may not exist if extension is disabled
+        try:
+            schemas = Gio.SettingsSchemaSource.get_default()
+            if schemas and schemas.lookup('org.gnome.shell.extensions.user-theme', True):
+                self.user_theme = Gio.Settings.new('org.gnome.shell.extensions.user-theme')
+            else:
+                self.user_theme = None
+        except Exception:
+            self.user_theme = None
 
-        self._load_css()
+        self._load_local_css()
 
-        # Outer container
         outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-        self.set_child(outer)
+        self.set_content(outer)
 
         # Custom titlebar
-        titlebar = Gtk.WindowHandle()
-        title_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
-        title_box.add_css_class('t-tweaks-titlebar')
-        title_label = Gtk.Label(label='Tweaks', xalign=0, hexpand=True)
-        title_label.add_css_class('title')
-        close_btn = Gtk.Button(icon_name='window-close-symbolic')
-        close_btn.add_css_class('t-close')
-        close_btn.connect('clicked', lambda _: self.close())
-        title_box.append(title_label)
-        title_box.append(close_btn)
-        titlebar.set_child(title_box)
-        outer.append(titlebar)
+        header = Adw.HeaderBar()
+        header.set_title_widget(Gtk.Label(label='Tweaks'))
+        outer.append(header)
 
-        # APPEARANCE section
+        # APPEARANCE
         outer.append(self._section_label('APPEARANCE'))
         outer.append(self._row('Theme', self._build_theme_toggle()))
         outer.append(self._row('Accent', self._build_accent_segments()))
         outer.append(self._row('Font', self._build_font_dropdown()))
 
-        # DESKTOP section
+        # DESKTOP
         outer.append(self._section_label('DESKTOP'))
         outer.append(self._row('Wallpaper', self._build_wallpaper_dropdown()))
 
-        # bottom padding
-        spacer = Gtk.Box()
-        spacer.set_size_request(0, 12)
-        outer.append(spacer)
+        outer.append(Gtk.Box(height_request=12))
 
-    def _load_css(self):
+    def _load_local_css(self):
         provider = Gtk.CssProvider()
-        provider.load_from_data(PANEL_CSS.encode())
-        Gtk.StyleContext.add_provider_for_display(
-            Gdk.Display.get_default(),
-            provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
+        try:
+            provider.load_from_data(PANEL_CSS)
+            display = Gdk.Display.get_default()
+            if display is not None:
+                Gtk.StyleContext.add_provider_for_display(
+                    display,
+                    provider,
+                    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+                )
+        except Exception as e:
+            print(f'[tanyel-tweaks] CSS load failed: {e}')
 
     def _section_label(self, text):
         lbl = Gtk.Label(label=text, xalign=0)
@@ -153,7 +130,7 @@ class TweaksWindow(Gtk.Window):
         row.append(control)
         return row
 
-    # ── Theme toggle (Light/Dark segmented) ──────────────────────
+    # ── Theme toggle ─────────────────────────────────────────────
     def _build_theme_toggle(self):
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0,
                       css_classes=['linked'])
@@ -164,41 +141,30 @@ class TweaksWindow(Gtk.Window):
         dark_btn.add_css_class('t-seg')
         dark_btn.set_group(light_btn)
 
-        current = self.iface.get_string('color-scheme')
-        if 'dark' in current:
+        if 'dark' in (self.iface.get_string('color-scheme') or ''):
             dark_btn.set_active(True)
         else:
             light_btn.set_active(True)
 
-        light_btn.connect('toggled', lambda b: b.get_active() and self._set_theme('light'))
-        dark_btn.connect('toggled', lambda b: b.get_active() and self._set_theme('dark'))
+        light_btn.connect('toggled', _safe(lambda b: b.get_active() and self._set_theme('light')))
+        dark_btn.connect('toggled', _safe(lambda b: b.get_active() and self._set_theme('dark')))
 
         box.append(light_btn)
         box.append(dark_btn)
         return box
 
+    @_safe
     def _set_theme(self, mode):
-        if mode == 'dark':
-            self.iface.set_string('color-scheme', 'prefer-dark')
-            self.iface.set_string('gtk-theme', 'TanyelOS-Dark')
-            try:
-                Gio.Settings.new('org.gnome.shell.extensions.user-theme') \
-                    .set_string('name', 'TanyelOS-Dark')
-            except Exception:
-                pass
-        else:
-            self.iface.set_string('color-scheme', 'default')
-            self.iface.set_string('gtk-theme', 'TanyelOS-Light')
-            try:
-                Gio.Settings.new('org.gnome.shell.extensions.user-theme') \
-                    .set_string('name', 'TanyelOS-Light')
-            except Exception:
-                pass
-        # Re-apply current wallpaper variant
+        variant = 'TanyelOS-Dark' if mode == 'dark' else 'TanyelOS-Light'
+        scheme = 'prefer-dark' if mode == 'dark' else 'default'
+        self.iface.set_string('color-scheme', scheme)
+        self.iface.set_string('gtk-theme', variant)
+        if self.user_theme is not None:
+            self.user_theme.set_string('name', variant)
         self._update_wallpaper_for_theme()
 
+    @_safe
     def _update_wallpaper_for_theme(self):
-        # Find current wallpaper base name (strip -dark/-light)
         current = self.bg.get_string('picture-uri') or ''
         for name in WALLPAPERS:
             if name in current:
@@ -206,7 +172,7 @@ class TweaksWindow(Gtk.Window):
                 return
         self._set_wallpaper('aurora')
 
-    # ── Accent segmented buttons ──────────────────────────────────
+    # ── Accent ───────────────────────────────────────────────────
     def _build_accent_segments(self):
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0,
                       css_classes=['linked'])
@@ -223,33 +189,32 @@ class TweaksWindow(Gtk.Window):
                 btn.set_group(first_btn)
             if hex_.lower() == saved.lower():
                 btn.set_active(True)
-            btn.connect('toggled', self._on_accent_toggled, hex_, name)
+            btn.connect('toggled', _safe(self._on_accent_toggled), hex_)
             box.append(btn)
         return box
 
-    def _on_accent_toggled(self, btn, hex_, name):
+    def _on_accent_toggled(self, btn, hex_):
         if not btn.get_active():
             return
+        # Spawn the accent applier — it handles CSS patching, wallpaper regen,
+        # and libadwaita accent. No theme-dance trick (caused session freezes).
         try:
             subprocess.Popen(
                 ['/usr/local/bin/tanyel-apply-accent', hex_],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                start_new_session=True,
             )
-            # Toggle theme to force GTK CSS reload in running apps
-            current_theme = self.iface.get_string('gtk-theme')
-            GLib.timeout_add(100, lambda: self.iface.set_string('gtk-theme', 'Adwaita') or False)
-            GLib.timeout_add(250, lambda: self.iface.set_string('gtk-theme', current_theme) or False)
         except FileNotFoundError:
-            pass
+            print('[tanyel-tweaks] tanyel-apply-accent not installed')
 
-    # ── Font dropdown ────────────────────────────────────────────
+    # ── Font ─────────────────────────────────────────────────────
     def _build_font_dropdown(self):
         dd = Gtk.DropDown.new_from_strings(FONTS)
         dd.set_valign(Gtk.Align.CENTER)
-        current = self.iface.get_string('font-name').rsplit(' ', 1)[0]
+        current = (self.iface.get_string('font-name') or '').rsplit(' ', 1)[0]
         if current in FONTS:
             dd.set_selected(FONTS.index(current))
-        dd.connect('notify::selected', self._on_font_changed)
+        dd.connect('notify::selected', _safe(self._on_font_changed))
         return dd
 
     def _on_font_changed(self, dd, _):
@@ -258,26 +223,25 @@ class TweaksWindow(Gtk.Window):
         if 'Mono' in font:
             self.iface.set_string('monospace-font-name', f'{font} 11')
 
-    # ── Wallpaper dropdown ───────────────────────────────────────
+    # ── Wallpaper ────────────────────────────────────────────────
     def _build_wallpaper_dropdown(self):
         dd = Gtk.DropDown.new_from_strings(WALLPAPERS)
         dd.set_valign(Gtk.Align.CENTER)
-        # Restore current
         current = self.bg.get_string('picture-uri') or ''
         for i, name in enumerate(WALLPAPERS):
             if name in current:
                 dd.set_selected(i)
                 break
-        dd.connect('notify::selected', self._on_wallpaper_changed)
+        dd.connect('notify::selected', _safe(self._on_wallpaper_changed))
         return dd
 
     def _on_wallpaper_changed(self, dd, _):
         self._set_wallpaper(WALLPAPERS[dd.get_selected()])
 
+    @_safe
     def _set_wallpaper(self, name):
         light_path = os.path.join(WALLPAPER_DIR, f'{name}-light.jpg')
         dark_path = os.path.join(WALLPAPER_DIR, f'{name}-dark.jpg')
-        # Picture URI for light/dark color schemes
         if os.path.exists(light_path):
             self.bg.set_string('picture-uri', f'file://{light_path}')
         elif os.path.exists(dark_path):
@@ -286,7 +250,6 @@ class TweaksWindow(Gtk.Window):
             self.bg.set_string('picture-uri-dark', f'file://{dark_path}')
         self.bg.set_string('picture-options', 'zoom')
 
-    # ── Helpers ──────────────────────────────────────────────────
     def _read_saved_accent(self):
         try:
             with open(os.path.expanduser('~/.config/tanyelos/accent')) as f:
