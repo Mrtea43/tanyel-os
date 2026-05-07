@@ -73,31 +73,8 @@ headerbar:focus-within .title {
   color: @fg_0;
 }
 
-/* Window control buttons */
-headerbar button.titlebutton {
-  border-radius: 50%;
-  min-width: 12px;
-  min-height: 12px;
-  padding: 0;
-  margin: 0 4px;
-  border: 0.5px solid alpha(#000, 0.15);
-  box-shadow: none;
-  background-size: 8px;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-headerbar button.titlebutton.close  { background-color: @c_close; }
-headerbar button.titlebutton.minimize { background-color: @c_min; }
-headerbar button.titlebutton.maximize { background-color: @c_max; }
-
-headerbar:not(:focus-within) button.titlebutton {
-  background-color: @line;
-}
-
-headerbar button.titlebutton:hover {
-  filter: brightness(0.9);
-}
+/* Traffic-light window controls live near the bottom of this file
+   (consolidated `windowcontrols button` rules). */
 
 /* ── Buttons ────────────────────────────────────────────────── */
 button {
@@ -467,6 +444,9 @@ windowcontrols button:hover image {
 windowcontrols button:active {
   filter: brightness(0.85);
 }
+headerbar:not(:focus-within) windowcontrols button {
+  opacity: 0.45;        /* dim, but keep the colors visible */
+}
 
 /* ── Headerbar tweaks to match the design's dark rounded window ─── */
 headerbar,
@@ -481,6 +461,53 @@ headerbar windowtitle,
   font-weight: 600;
   font-size: 13px;
   color: @fg_0;
+}
+
+/* ── Nautilus / split-view sidebar tracks @bg_1 (auto-flips for light) ── */
+.navigation-sidebar,
+.sidebar-pane,
+placessidebar,
+placessidebar list {
+  background-color: @bg_1;
+  color: @fg_0;
+}
+
+.navigation-sidebar row,
+placessidebar row {
+  border-radius: 6px;
+  margin: 0 6px;
+  padding: 6px 8px;
+  color: @fg_0;
+  background-color: transparent;
+}
+
+.navigation-sidebar row:hover,
+placessidebar row:hover {
+  background-color: alpha(@fg_0, 0.06);
+}
+
+.navigation-sidebar row:selected,
+placessidebar row:selected,
+.navigation-sidebar row:selected:focus,
+placessidebar row:selected:focus {
+  background-color: @accent;
+  color: #FFFFFF;
+}
+
+/* ── Inner / split-view headerbars — match outer @bg_2 ──────────── */
+.csd > .titlebar,
+window.csd > headerbar,
+window.csd > leaflet > headerbar,
+window.csd > splitview > headerbar,
+splitview > * > headerbar {
+  background-color: @bg_2;
+}
+
+splitview > separator,
+leaflet > separator {
+  background-color: @line;
+  min-width: 0;
+  min-height: 0;
 }
 
 /* Light/Dark variants are built as separate /usr/share/themes/TanyelOS-{Light,Dark}/

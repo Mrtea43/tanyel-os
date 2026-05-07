@@ -196,12 +196,11 @@ class TweaksWindow(Adw.ApplicationWindow):
     def _on_accent_toggled(self, btn, hex_):
         if not btn.get_active():
             return
-        # --no-wallpaper makes accent change feel instant: CSS + libadwaita
-        # + Yaru icon-theme update in <100ms; user can pick a wallpaper
-        # in the dropdown below if they want it tinted too.
+        # Wallpaper regen runs in a subshell inside apply-accent, so this
+        # call returns instantly. The wallpaper retints ~2s later.
         try:
             subprocess.Popen(
-                ['/usr/local/bin/tanyel-apply-accent', hex_, '--no-wallpaper'],
+                ['/usr/local/bin/tanyel-apply-accent', hex_],
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                 start_new_session=True,
             )

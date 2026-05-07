@@ -33,6 +33,14 @@ DEFAULT_ACCENT="#2B9EA8"
 WP_DIR="$HOME/.local/share/wallpapers/tanyel"
 mkdir -p "$WP_DIR"
 
+# Previous accent (the color currently baked into the theme CSS).
+# Falls back to the build-time default on a fresh install.
+PREV_ACCENT="$(cat "$HOME/.config/tanyelos/accent" 2>/dev/null | tr -d '[:space:]' || true)"
+[[ ! "$PREV_ACCENT" =~ ^#[0-9A-Fa-f]{6}$ ]] && PREV_ACCENT="$DEFAULT_ACCENT"
+PR=$((16#${PREV_ACCENT:1:2}))
+PG=$((16#${PREV_ACCENT:3:2}))
+PB=$((16#${PREV_ACCENT:5:2}))
+
 # ── 1. Native libadwaita accent (instant) ──────────────────────
 declare -A ACCENT_NAMES=(
   ["#2B9EA8"]="teal"
@@ -67,11 +75,26 @@ done
 gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-running-dots-color "$ACCENT" 2>/dev/null || true
 
 # ── 4. Patch theme CSS in BOTH variants ────────────────────────
+# Replaces both the hex form (#XXXXXX) and the rgba(R,G,B,…) form. Uses the
+# *previous* accent as the "from" so changes are reversible (e.g. amber→teal).
 patch_css() {
   local file="$1"
   [[ -f "$file" ]] || return 0
-  sudo sed -i "s/${DEFAULT_ACCENT}/${ACCENT}/gi" "$file" 2>/dev/null || \
-    sed -i "s/${DEFAULT_ACCENT}/${ACCENT}/gi" "$file" 2>/dev/null || true
+  local sed_cmds=(
+    -e "s/${PREV_ACCENT}/${ACCENT}/gi"
+    -e "s/rgba(${PR}, *${PG}, *${PB},/rgba(${R},${G},${B},/g"
+  )
+  # Also try the build-time default — covers fresh installs where the CSS
+  # hasn't been patched yet, even if PREV_ACCENT differs from DEFAULT_ACCENT.
+  if [[ "$PREV_ACCENT" != "$DEFAULT_ACCENT" ]]; then
+    local DR=$((16#${DEFAULT_ACCENT:1:2})) DG=$((16#${DEFAULT_ACCENT:3:2})) DB=$((16#${DEFAULT_ACCENT:5:2}))
+    sed_cmds+=(
+      -e "s/${DEFAULT_ACCENT}/${ACCENT}/gi"
+      -e "s/rgba(${DR}, *${DG}, *${DB},/rgba(${R},${G},${B},/g"
+    )
+  fi
+  sudo sed -i "${sed_cmds[@]}" "$file" 2>/dev/null || \
+    sed -i "${sed_cmds[@]}" "$file" 2>/dev/null || true
 }
 
 echo "→ Patching theme CSS (Light + Dark)…"

@@ -73,31 +73,8 @@ headerbar:focus-within .title {
   color: @fg_0;
 }
 
-/* Window control buttons */
-headerbar button.titlebutton {
-  border-radius: 50%;
-  min-width: 12px;
-  min-height: 12px;
-  padding: 0;
-  margin: 0 4px;
-  border: 0.5px solid alpha(#000, 0.15);
-  box-shadow: none;
-  background-size: 8px;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-headerbar button.titlebutton.close  { background-color: @c_close; }
-headerbar button.titlebutton.minimize { background-color: @c_min; }
-headerbar button.titlebutton.maximize { background-color: @c_max; }
-
-headerbar:not(:focus-within) button.titlebutton {
-  background-color: @line;
-}
-
-headerbar button.titlebutton:hover {
-  filter: brightness(0.9);
-}
+/* Traffic-light window controls live near the bottom of this file
+   (consolidated `headerbar button.titlebutton` rules). */
 
 /* ── Buttons ────────────────────────────────────────────────── */
 button {
@@ -486,10 +463,35 @@ headerbar button.titlebutton:hover image {
   opacity: 0.55;
 }
 
+headerbar:not(:focus-within) button.titlebutton {
+  opacity: 0.45;        /* dim when unfocused without losing red/yellow/green */
+}
+
 .titlebar,
 headerbar {
   background-color: @bg_2;
   border-bottom: 0.5px solid @line;
   min-height: 36px;
   padding: 0 8px;
+}
+
+/* Nautilus 3 sidebar — track @bg_1 so light variant flips */
+placessidebar,
+placessidebar list {
+  background-color: @bg_1;
+  color: @fg_0;
+}
+placessidebar row {
+  border-radius: 6px;
+  margin: 0 6px;
+  color: @fg_0;
+  background-color: transparent;
+}
+placessidebar row:hover {
+  background-color: alpha(@fg_0, 0.06);
+}
+placessidebar row:selected,
+placessidebar row:selected:focus {
+  background-color: @accent;
+  color: #FFFFFF;
 }
