@@ -467,19 +467,23 @@ headerbar:not(:focus-within) button.titlebutton {
   opacity: 0.45;        /* dim when unfocused without losing red/yellow/green */
 }
 
+/* Unified Files / split-view chrome — one even color, no separators */
 .titlebar,
 headerbar {
-  background-color: @bg_2;
-  border-bottom: 0.5px solid @line;
+  background-color: @bg_1;
+  border-bottom: none;
+  box-shadow: none;
   min-height: 36px;
   padding: 0 8px;
 }
 
-/* Nautilus 3 sidebar — track @bg_1 so light variant flips */
 placessidebar,
 placessidebar list {
   background-color: @bg_1;
   color: @fg_0;
+  border: none;
+  border-right: none;
+  box-shadow: none;
 }
 placessidebar row {
   border-radius: 6px;
@@ -494,4 +498,19 @@ placessidebar row:selected,
 placessidebar row:selected:focus {
   background-color: @accent;
   color: #FFFFFF;
+}
+
+.nautilus-window,
+.nautilus-window viewport,
+.nautilus-window scrolledwindow,
+.view {
+  background-color: @bg_1;
+}
+
+separator.horizontal,
+headerbar separator {
+  background-color: transparent;
+  border: none;
+  min-width: 0;
+  min-height: 0;
 }

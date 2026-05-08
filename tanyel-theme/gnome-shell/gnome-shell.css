@@ -223,11 +223,24 @@
   background-color: rgba(43, 158, 168, 0.2);
 }
 
-/* ── Right-click context menu ───────────────────────────────── */
-.popup-menu {
+/* ── Right-click context menu + system popups ─────────────────
+   The white-corner issue comes from the rectangular outer .popup-menu-boxpointer
+   showing around the rounded .popup-menu. Strip the outer's background so only
+   the rounded inner is visible. */
+.popup-menu-boxpointer,
+.candidate-popup-boxpointer,
+.osd-window {
+  -arrow-background-color: transparent;
+  -arrow-border-color: transparent;
+  background-color: transparent;
+  border: none;
+}
+
+.popup-menu,
+.popup-menu-content {
   background-color: rgba(253, 252, 251, 0.92);
   border: 0.5px solid rgba(216, 212, 207, 0.8);
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow:
     0 1px 2px rgba(20, 20, 20, 0.06),
     0 8px 24px rgba(20, 20, 20, 0.16);
@@ -235,6 +248,45 @@
   color: #312E29;
   font-size: 13px;
   font-family: "Geist", "Inter", system-ui;
+}
+
+/* Ubuntu's quick-settings (volume/brightness/wifi pop-down) and date-menu */
+.quick-settings,
+.quick-settings-grid,
+.quick-toggle-menu,
+#calendarArea,
+.datemenu-popover,
+.message-list,
+.message-list-sections,
+.aggregate-menu .popup-menu-content {
+  background-color: rgba(253, 252, 251, 0.92);
+  border: 0.5px solid rgba(216, 212, 207, 0.8);
+  border-radius: 12px;
+  color: #312E29;
+}
+
+.quick-toggle,
+.quick-slider,
+.quick-settings .button {
+  background-color: rgba(245, 243, 239, 0.10);
+  border: 0.5px solid rgba(216, 212, 207, 0.6);
+  border-radius: 8px;
+  color: #312E29;
+}
+
+.quick-toggle:checked,
+.quick-toggle:active {
+  background-color: rgba(43,158,168,0.22);
+  border-color: rgba(43,158,168,0.5);
+  color: #312E29;
+}
+
+.message,
+.notification {
+  background-color: rgba(253, 252, 251, 0.96);
+  border: 0.5px solid rgba(216, 212, 207, 0.8);
+  border-radius: 10px;
+  color: #312E29;
 }
 
 .popup-menu-item {

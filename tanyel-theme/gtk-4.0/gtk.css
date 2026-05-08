@@ -448,11 +448,14 @@ headerbar:not(:focus-within) windowcontrols button {
   opacity: 0.45;        /* dim, but keep the colors visible */
 }
 
-/* ── Headerbar tweaks to match the design's dark rounded window ─── */
+/* ── Unified Files / split-view chrome ─────────────────────────
+   Headerbar, sidebar, and main content all use @bg_1 — one even color
+   across the whole window with no visible separators. */
 headerbar,
 .titlebar {
-  background-color: @bg_2;
-  border-bottom: 0.5px solid @line;
+  background-color: @bg_1;
+  border-bottom: none;
+  box-shadow: none;
   min-height: 36px;
   padding: 0 8px;
 }
@@ -463,13 +466,16 @@ headerbar windowtitle,
   color: @fg_0;
 }
 
-/* ── Nautilus / split-view sidebar tracks @bg_1 (auto-flips for light) ── */
+/* Sidebar — matches headerbar/main, no border on the right edge */
 .navigation-sidebar,
 .sidebar-pane,
 placessidebar,
 placessidebar list {
   background-color: @bg_1;
   color: @fg_0;
+  border: none;
+  border-right: none;
+  box-shadow: none;
 }
 
 .navigation-sidebar row,
@@ -494,18 +500,37 @@ placessidebar row:selected:focus {
   color: #FFFFFF;
 }
 
-/* ── Inner / split-view headerbars — match outer @bg_2 ──────────── */
+/* Inner / split-view headerbars — match the outer headerbar */
 .csd > .titlebar,
 window.csd > headerbar,
 window.csd > leaflet > headerbar,
 window.csd > splitview > headerbar,
 splitview > * > headerbar {
-  background-color: @bg_2;
+  background-color: @bg_1;
+  border-bottom: none;
+  box-shadow: none;
 }
 
+/* Nautilus main pane — same color as sidebar/headerbar */
+.nautilus-window,
+.nautilus-window > contents,
+.nautilus-window scrolledwindow,
+.nautilus-window viewport,
+.nautilus-window-slot,
+nautilusgtkplaceslistitem,
+.view {
+  background-color: @bg_1;
+}
+
+/* Strip every separator between Files panes */
 splitview > separator,
-leaflet > separator {
-  background-color: @line;
+leaflet > separator,
+separator.horizontal,
+headerbar separator,
+headerbar + headerbar,
+.csd headerbar + .csd headerbar {
+  background-color: transparent;
+  border: none;
   min-width: 0;
   min-height: 0;
 }
