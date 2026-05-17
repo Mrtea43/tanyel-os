@@ -431,36 +431,38 @@ infobar {
 /* ── macOS-style traffic-light window controls (GTK3) ────────── */
 .titlebar button.titlebutton,
 headerbar button.titlebutton {
+  background: transparent;
   background-image: none;
-  background-color: transparent;
   border: none;
   box-shadow: none;
-  min-width: 12px;
-  min-height: 12px;
+  min-width: 14px;
+  min-height: 14px;
   margin: 0 4px;
   padding: 0;
   border-radius: 999px;
   -gtk-icon-shadow: none;
+  color: transparent;
 }
 .titlebar button.titlebutton image,
 headerbar button.titlebutton image {
   opacity: 0;
+  -gtk-icon-size: 0;
 }
 .titlebar button.titlebutton.close,
 headerbar button.titlebutton.close {
-  background-color: @c_close;
+  background: @c_close;
 }
 .titlebar button.titlebutton.minimize,
 headerbar button.titlebutton.minimize {
-  background-color: @c_min;
+  background: @c_min;
 }
 .titlebar button.titlebutton.maximize,
 headerbar button.titlebutton.maximize {
-  background-color: @c_max;
+  background: @c_max;
 }
-.titlebar button.titlebutton:hover image,
-headerbar button.titlebutton:hover image {
-  opacity: 0.55;
+.titlebar button.titlebutton:hover,
+headerbar button.titlebutton:hover {
+  filter: brightness(1.08);
 }
 
 headerbar:not(:focus-within) button.titlebutton {

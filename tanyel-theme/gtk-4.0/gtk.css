@@ -411,35 +411,33 @@ windowcontrols {
   margin: 0 4px;
 }
 windowcontrols button {
+  background: transparent;
   background-image: none;
-  background-color: transparent;
+  -gtk-icon-source: none;
   border: none;
   box-shadow: none;
-  min-width: 12px;
-  min-height: 12px;
+  min-width: 14px;
+  min-height: 14px;
   margin: 0 4px;
   padding: 0;
   border-radius: 999px;
+  color: transparent;       /* hide the X/dash/expand glyph */
 }
 windowcontrols button image {
   opacity: 0;
-  -gtk-icon-size: 8px;
-  color: rgba(20, 20, 20, 0.6);
+  -gtk-icon-size: 0;
 }
 windowcontrols button.close {
-  background-color: @c_close;
+  background: @c_close;
 }
 windowcontrols button.minimize {
-  background-color: @c_min;
+  background: @c_min;
 }
 windowcontrols button.maximize {
-  background-color: @c_max;
+  background: @c_max;
 }
 windowcontrols button:hover {
-  filter: brightness(1.05);
-}
-windowcontrols button:hover image {
-  opacity: 0.55;
+  filter: brightness(1.08);
 }
 windowcontrols button:active {
   filter: brightness(0.85);

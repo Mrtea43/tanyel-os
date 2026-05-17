@@ -433,11 +433,16 @@
 }
 
 /* ── Window List — bottom panel ──────────────────────────────── */
+/* Subtle accent glow along the top edge, fading into the dark slate. */
 #panel.window-list,
 #window-list {
-  background-color: rgba(27, 31, 42, 0.92);
-  border-top: 0.5px solid rgba(58, 63, 82, 0.8);
-  height: 36px;
+  background: linear-gradient(to bottom,
+    rgba(43, 158, 168, 0.22) 0,
+    rgba(43, 158, 168, 0.08) 3px,
+    rgba(27, 31, 42, 0.94) 8px,
+    rgba(27, 31, 42, 0.94) 100%);
+  border-top: none;
+  height: 40px;
 }
 
 .window-list,
@@ -449,11 +454,11 @@
 
 .window-list .window-button,
 .window-list-window-button {
-  background-color: rgba(245, 243, 239, 0.04);
-  border: 0.5px solid rgba(58, 63, 82, 0.4);
+  background-color: rgba(245, 243, 239, 0.05);
+  border: 0.5px solid rgba(58, 63, 82, 0.5);
   border-radius: 6px;
   margin: 2px;
-  padding: 0 10px;
+  padding: 0 12px;
   color: #F5F3EF;
   font-size: 12px;
   font-weight: 500;
@@ -465,20 +470,24 @@
   background-color: rgba(245, 243, 239, 0.10);
 }
 
+/* Focused task: faint chip + 2px accent underline (matches design) */
 .window-list .window-button.focused,
 .window-list-window-button.focused {
-  background-color: rgba(43,158,168,0.22);
-  border-color: rgba(43,158,168,0.5);
+  background-color: rgba(43,158,168,0.16);
+  border-color: rgba(43,158,168,0.45);
   color: #FFFFFF;
+  box-shadow: inset 0 -2px 0 0 #2B9EA8;
 }
 
+/* Bigger, bolder clock — matches design's prominent time display */
 .window-list .clock,
 #window-list .clock {
   font-variant-numeric: tabular-nums;
   color: #F5F3EF;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0 14px;
+  letter-spacing: 0.3px;
 }
 
 .window-list .workspace-indicator,
