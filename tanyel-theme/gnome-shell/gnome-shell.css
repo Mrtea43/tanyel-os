@@ -458,7 +458,7 @@
 
 .window-list {
   spacing: 4px;
-  font-size: 12pt;
+  font-size: 14px;
   padding: 4px 8px;
 }
 
@@ -467,13 +467,12 @@
   background-color: rgba(245, 243, 239, 0.06);
   border: 0.5px solid rgba(58, 63, 82, 0.5);
   border-radius: 8px;
-  padding: 7px 12px;
+  padding: 6px 12px;
   color: #F5F3EF;
-  font-size: 12pt;
+  font-size: 14px;
   font-weight: 500;
-  -st-natural-width: 14em;
-  max-width: 14em;
-  transition: 150ms ease;
+  -st-natural-width: 16em;
+  max-width: 16em;
 }
 
 .window-button:hover > StWidget {
@@ -496,13 +495,31 @@
   color: rgba(245, 243, 239, 0.45);
 }
 
+/* Explicit styling for the label and icon inside the chip — StLabel does
+   not inherit font-size/color reliably from ancestor selectors. */
+.window-button StLabel,
+.window-button > StWidget StLabel,
+.window-button-box StLabel,
+.window-button > StWidget > StBoxLayout > StLabel {
+  color: #F5F3EF;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.window-button.focused StLabel,
+.window-button.focused > StWidget StLabel {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
 .window-button-box {
   spacing: 8px;
 }
 
 .window-button-icon {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
+  icon-size: 22px;
 }
 
 /* Workspace indicator (the box with the active workspace number) */
