@@ -14,9 +14,9 @@
 @define-color line_soft     /*LINESOFT*/#323749/*ENDLINESOFT*/;
 @define-color accent        #2B9EA8;
 @define-color accent_soft   /*ACCENTSOFT*/#1A3B42/*ENDACCENTSOFT*/;
-@define-color c_close       #E05C4A;
-@define-color c_min         #D4A843;
-@define-color c_max         #52B354;
+@define-color c_close       #FF5F57;
+@define-color c_min         #FEBC2E;
+@define-color c_max         #28C840;
 
 /* ── Base ───────────────────────────────────────────────────── */
 * {
