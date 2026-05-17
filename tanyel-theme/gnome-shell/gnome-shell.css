@@ -432,10 +432,13 @@
   border-radius: 4px;
 }
 
-/* ── Window List — bottom panel ──────────────────────────────── */
-/* Subtle accent glow along the top edge, fading into the dark slate. */
-#panel.window-list,
-#window-list {
+/* ── Window List — bottom panel ──────────────────────────────────
+   Window List names its outer container `.bottom-panel` (id `window-list`
+   in some versions). We cover both. The chip class is `.window-button`. */
+#window-list,
+.bottom-panel,
+.window-list,
+.window-list-box {
   background: linear-gradient(to bottom,
     rgba(43, 158, 168, 0.22) 0,
     rgba(43, 158, 168, 0.08) 4px,
@@ -443,67 +446,75 @@
     rgba(27, 31, 42, 0.94) 100%);
   border-top: none;
   height: 56px;
-}
-
-.window-list,
-.window-list-box {
-  background: transparent;
   spacing: 6px;
   padding: 6px 10px;
+  color: #F5F3EF;
+  font-size: 14px;
+  font-family: "Geist", "Inter", system-ui;
 }
 
+/* Chip — fits its content (icon + label) rather than stretching across the
+   bar. max-width caps long titles. */
+.window-button,
 .window-list .window-button,
-.window-list-window-button {
-  background-color: rgba(245, 243, 239, 0.05);
+.window-list-window-button,
+.bottom-panel .window-button {
+  background-color: rgba(245, 243, 239, 0.06);
   border: 0.5px solid rgba(58, 63, 82, 0.5);
   border-radius: 8px;
   margin: 2px;
-  padding: 4px 14px;
+  padding: 4px 12px;
   color: #F5F3EF;
   font-size: 14px;
   font-weight: 500;
   min-height: 40px;
-  min-width: 180px;
+  min-width: 0;
+  max-width: 220px;
   spacing: 8px;
 }
 
-/* Force the label + icon inside the chip to render with our font/color.
-   Window List builds the chip as `StBoxLayout > StBin(StIcon) + StLabel`,
-   neither of which inherits `font-size`/`color` from the button on its own. */
+.window-button:hover,
+.window-list .window-button:hover,
+.bottom-panel .window-button:hover {
+  background-color: rgba(245, 243, 239, 0.12);
+}
+
+/* Focused task: tinted chip + 2px accent underline */
+.window-button.focused,
+.window-list .window-button.focused,
+.bottom-panel .window-button.focused {
+  background-color: rgba(43,158,168,0.18);
+  border-color: rgba(43,158,168,0.5);
+  color: #FFFFFF;
+  box-shadow: inset 0 -2px 0 0 #2B9EA8;
+}
+
+/* StLabel / StIcon inside the chip — they don't inherit from the button. */
+.window-button StLabel,
 .window-list .window-button StLabel,
-.window-list-window-button StLabel {
+.bottom-panel .window-button StLabel,
+.window-app-label {
   color: #F5F3EF;
   font-size: 14px;
   font-weight: 500;
   padding-left: 6px;
 }
+.window-button StIcon,
 .window-list .window-button StIcon,
-.window-list-window-button StIcon {
+.bottom-panel .window-button StIcon {
   icon-size: 20px;
   color: #F5F3EF;
 }
+.window-button.focused StLabel,
 .window-list .window-button.focused StLabel,
-.window-list-window-button.focused StLabel {
+.bottom-panel .window-button.focused StLabel {
   color: #FFFFFF;
   font-weight: 600;
 }
 
-.window-list .window-button:hover,
-.window-list-window-button:hover {
-  background-color: rgba(245, 243, 239, 0.10);
-}
-
-/* Focused task: faint chip + 2px accent underline (matches design) */
-.window-list .window-button.focused,
-.window-list-window-button.focused {
-  background-color: rgba(43,158,168,0.16);
-  border-color: rgba(43,158,168,0.45);
-  color: #FFFFFF;
-  box-shadow: inset 0 -2px 0 0 #2B9EA8;
-}
-
-/* Bigger, bolder clock — matches design's prominent time display */
+/* Clock + workspace indicator at the right edge */
 .window-list .clock,
+.bottom-panel .clock,
 #window-list .clock {
   font-variant-numeric: tabular-nums;
   color: #F5F3EF;
@@ -514,6 +525,7 @@
 }
 
 .window-list .workspace-indicator,
+.bottom-panel .workspace-indicator,
 #window-list .workspace-indicator {
   color: #F5F3EF;
   font-weight: 600;
