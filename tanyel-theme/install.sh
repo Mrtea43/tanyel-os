@@ -145,6 +145,33 @@ install_extension "user-theme@gnome-shell-extensions.gcampax.github.com"    "Use
 install_extension "just-perfection-desktop@just-perfection"                  "Just Perfection"
 install_extension "window-list@gnome-shell-extensions.gcampax.github.com"   "Window List"
 
+# Fork Window List to user scope so we ship our own stylesheets. User
+# extensions in ~/.local/share/gnome-shell/extensions/ take precedence over
+# system ones at /usr/share/gnome-shell/extensions/, so this doesn't touch
+# system files (apt upgrades won't clobber it either).
+fork_window_list() {
+  local uuid="window-list@gnome-shell-extensions.gcampax.github.com"
+  local sys="/usr/share/gnome-shell/extensions/$uuid"
+  local usr="$HOME/.local/share/gnome-shell/extensions/$uuid"
+  local src="$SCRIPT_DIR/extensions/window-list"
+
+  if [[ ! -d "$sys" ]]; then
+    warn "Window List not installed system-wide; skipping fork"
+    return
+  fi
+  if [[ ! -f "$src/stylesheet-dark.css" ]]; then
+    warn "TanyelOS Window List stylesheets not found at $src; skipping fork"
+    return
+  fi
+
+  mkdir -p "$usr"
+  cp -rf "$sys"/* "$usr/"
+  cp -f "$src/stylesheet-dark.css"  "$usr/stylesheet-dark.css"
+  cp -f "$src/stylesheet-light.css" "$usr/stylesheet-light.css"
+  ok "Window List forked + restyled at $usr"
+}
+fork_window_list
+
 # ── 3. Build TanyelOS-Light + TanyelOS-Dark theme variants ───────
 step "3/6  Building light and dark theme variants"
 

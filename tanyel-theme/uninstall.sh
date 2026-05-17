@@ -43,12 +43,13 @@ for uuid in \
   "dash-to-panel@jderose9.github.com" \
   "arcmenu@arcmenu.com" \
   "blur-my-shell@aunetx" \
-  "just-perfection-desktop@just-perfection"
+  "just-perfection-desktop@just-perfection" \
+  "window-list@gnome-shell-extensions.gcampax.github.com"
 do
   gnome-extensions disable "$uuid" 2>/dev/null || true
   rm -rf "$HOME/.local/share/gnome-shell/extensions/$uuid"
 done
-ok "Extensions disabled and removed"
+ok "Extensions disabled and removed (the user-scope Window List fork is also removed; the system copy at /usr/share/gnome-shell/extensions/ is left in place)"
 
 # ── 5. Plymouth boot theme ────────────────────────────────────
 step "Removing Plymouth boot theme"
