@@ -456,14 +456,17 @@
   font-family: "Geist", "Inter", system-ui;
 }
 
-.window-list {
+/* All Window List rules need to be prefixed with `.bottom-panel` to win
+   specificity over the extension's own stylesheet-dark.css (which loads
+   AFTER our user theme CSS — same selector, extension wins by load order). */
+
+.bottom-panel .window-list {
   spacing: 4px;
   font-size: 14px;
   padding: 4px 8px;
 }
 
-/* The chip itself — the StWidget child of .window-button. */
-.window-button > StWidget {
+.bottom-panel .window-button > StWidget {
   background-color: rgba(245, 243, 239, 0.06);
   border: 0.5px solid rgba(58, 63, 82, 0.5);
   border-radius: 8px;
@@ -475,14 +478,14 @@
   max-width: 16em;
 }
 
-.window-button:hover > StWidget {
+.bottom-panel .window-button:hover > StWidget {
   background-color: rgba(245, 243, 239, 0.12);
   color: #FFFFFF;
 }
 
-.window-button.focused > StWidget,
-.window-button:active > StWidget,
-.window-button:focus > StWidget {
+.bottom-panel .window-button.focused > StWidget,
+.bottom-panel .window-button:active > StWidget,
+.bottom-panel .window-button:focus > StWidget {
   background-color: rgba(43, 158, 168, 0.20);
   border-color: rgba(43, 158, 168, 0.55);
   color: #FFFFFF;
@@ -490,36 +493,33 @@
   box-shadow: inset 0 -2px 0 0 #2B9EA8;
 }
 
-.window-button.minimized > StWidget {
+.bottom-panel .window-button.minimized > StWidget {
   background-color: rgba(245, 243, 239, 0.03);
   color: rgba(245, 243, 239, 0.45);
 }
 
-/* Explicit styling for the label and icon inside the chip — StLabel does
-   not inherit font-size/color reliably from ancestor selectors. */
-.window-button StLabel,
-.window-button > StWidget StLabel,
-.window-button-box StLabel,
-.window-button > StWidget > StBoxLayout > StLabel {
+.bottom-panel .window-button-box {
+  spacing: 8px;
+}
+
+.bottom-panel .window-button-icon {
+  width: 22px;
+  height: 22px;
+  icon-size: 22px;
+}
+
+/* Explicit StLabel — also prefixed for specificity. */
+.bottom-panel .window-button StLabel,
+.bottom-panel .window-button > StWidget StLabel,
+.bottom-panel .window-button-box StLabel {
   color: #F5F3EF;
   font-size: 14px;
   font-weight: 500;
 }
 
-.window-button.focused StLabel,
-.window-button.focused > StWidget StLabel {
+.bottom-panel .window-button.focused StLabel {
   color: #FFFFFF;
   font-weight: 600;
-}
-
-.window-button-box {
-  spacing: 8px;
-}
-
-.window-button-icon {
-  width: 22px;
-  height: 22px;
-  icon-size: 22px;
 }
 
 /* Workspace indicator (the box with the active workspace number) */
