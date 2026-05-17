@@ -161,16 +161,8 @@ class TweaksWindow(Adw.ApplicationWindow):
         self.iface.set_string('gtk-theme', variant)
         if self.user_theme is not None:
             self.user_theme.set_string('name', variant)
-        self._update_wallpaper_for_theme()
-
-    @_safe
-    def _update_wallpaper_for_theme(self):
-        current = self.bg.get_string('picture-uri') or ''
-        for name in WALLPAPERS:
-            if name in current:
-                self._set_wallpaper(name)
-                return
-        self._set_wallpaper('aurora')
+        # Wallpaper is left untouched — the user picks it explicitly from the
+        # wallpaper dropdown below. Theme toggle is purely a GTK + shell swap.
 
     # ── Accent ───────────────────────────────────────────────────
     def _build_accent_segments(self):

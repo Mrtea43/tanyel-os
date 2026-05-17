@@ -74,40 +74,58 @@ for n in 1 2 3 4; do
 done
 gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-running-dots-color "$ACCENT" 2>/dev/null || true
 
-# ── 4. Patch theme CSS in BOTH variants ────────────────────────
-# Replaces both the hex form (#XXXXXX) and the rgba(R,G,B,…) form. Uses the
-# *previous* accent as the "from" so changes are reversible (e.g. amber→teal).
-patch_css() {
-  local file="$1"
-  [[ -f "$file" ]] || return 0
-  local sed_cmds=(
+# ── 4. Patch theme CSS in BOTH variants — parallel ────────────
+# Replaces hex (#XXXXXX) and rgba(R,G,B,...) forms. Uses the *previous*
+# accent as the "from" so changes are reversible (amber → teal → amber works).
+# Parallelized via xargs -P 4 to avoid 1-3 second blocking on accent switch.
+
+# Skip /usr/share/themes if sudo would prompt — never block the UI.
+sudo_ok=false
+if sudo -n true 2>/dev/null; then
+  sudo_ok=true
+fi
+
+DR=$((16#${DEFAULT_ACCENT:1:2}))
+DG=$((16#${DEFAULT_ACCENT:3:2}))
+DB=$((16#${DEFAULT_ACCENT:5:2}))
+
+# Build list of target files
+files=()
+for theme in TanyelOS-Light TanyelOS-Dark TanyelOS; do
+  for sub in gtk-4.0 gtk-3.0 gnome-shell; do
+    if [[ "$sudo_ok" == "true" ]]; then
+      files+=("/usr/share/themes/${theme}/${sub}/gtk.css")
+      files+=("/usr/share/themes/${theme}/${sub}/gnome-shell.css")
+    fi
+    files+=("$HOME/.local/share/themes/${theme}/${sub}/gtk.css")
+    files+=("$HOME/.local/share/themes/${theme}/${sub}/gnome-shell.css")
+  done
+done
+files+=("$HOME/.config/gtk-4.0/gtk.css" "$HOME/.config/gtk-3.0/gtk.css")
+
+# Export so the xargs subshell can read them
+export PREV_ACCENT ACCENT PR PG PB R G B DEFAULT_ACCENT DR DG DB
+
+echo "→ Patching theme CSS (Light + Dark, parallel)…"
+printf '%s\0' "${files[@]}" | xargs -0 -P 4 -I '{}' bash -c '
+  file="$1"
+  [[ -f "$file" ]] || exit 0
+  sed_cmd=(
     -e "s/${PREV_ACCENT}/${ACCENT}/gi"
     -e "s/rgba(${PR}, *${PG}, *${PB},/rgba(${R},${G},${B},/g"
   )
-  # Also try the build-time default — covers fresh installs where the CSS
-  # hasn't been patched yet, even if PREV_ACCENT differs from DEFAULT_ACCENT.
   if [[ "$PREV_ACCENT" != "$DEFAULT_ACCENT" ]]; then
-    local DR=$((16#${DEFAULT_ACCENT:1:2})) DG=$((16#${DEFAULT_ACCENT:3:2})) DB=$((16#${DEFAULT_ACCENT:5:2}))
-    sed_cmds+=(
+    sed_cmd+=(
       -e "s/${DEFAULT_ACCENT}/${ACCENT}/gi"
       -e "s/rgba(${DR}, *${DG}, *${DB},/rgba(${R},${G},${B},/g"
     )
   fi
-  sudo sed -i "${sed_cmds[@]}" "$file" 2>/dev/null || \
-    sed -i "${sed_cmds[@]}" "$file" 2>/dev/null || true
-}
-
-echo "→ Patching theme CSS (Light + Dark)…"
-for theme in TanyelOS-Light TanyelOS-Dark TanyelOS; do
-  for sub in gtk-4.0 gtk-3.0 gnome-shell; do
-    patch_css "/usr/share/themes/${theme}/${sub}/gtk.css"
-    patch_css "/usr/share/themes/${theme}/${sub}/gnome-shell.css"
-    patch_css "$HOME/.local/share/themes/${theme}/${sub}/gtk.css"
-    patch_css "$HOME/.local/share/themes/${theme}/${sub}/gnome-shell.css"
-  done
-done
-patch_css "$HOME/.config/gtk-4.0/gtk.css"
-patch_css "$HOME/.config/gtk-3.0/gtk.css"
+  if [[ -w "$file" ]]; then
+    sed -i "${sed_cmd[@]}" "$file" 2>/dev/null || true
+  else
+    sudo -n sed -i "${sed_cmd[@]}" "$file" 2>/dev/null || true
+  fi
+' _ '{}'
 
 # ── 5. Save preference ─────────────────────────────────────────
 mkdir -p "$HOME/.config/tanyelos"
@@ -129,7 +147,17 @@ CURRENT_NAME=""
 if [[ "$CURRENT_URI" =~ /tanyel/([^/.]+)\.jpg ]]; then
   CURRENT_NAME="${BASH_REMATCH[1]}"
 fi
-[[ -z "$CURRENT_NAME" ]] && CURRENT_NAME="aurora-dark"
+# Fallback: pick aurora variant matching the current color scheme. The old
+# code always defaulted to aurora-dark, which broke light + <new-accent> for
+# users who'd never set a wallpaper variant explicitly.
+if [[ -z "$CURRENT_NAME" ]]; then
+  SCHEME=$(gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null | tr -d "'")
+  if [[ "$SCHEME" == "prefer-light" || "$SCHEME" == "default" ]]; then
+    CURRENT_NAME="aurora-light"
+  else
+    CURRENT_NAME="aurora-dark"
+  fi
+fi
 
 # Run the entire wallpaper regen in the background — instant return to Tweaks.
 (
