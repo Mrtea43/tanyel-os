@@ -40,7 +40,7 @@ favorite-apps=['tanyelos-about.desktop', 'tanyelos-projects.desktop', 'org.gnome
 [org/gnome/shell/extensions/window-list]
 show-on-all-monitors=false
 display-all-workspaces=false
-grouping-mode='auto'
+grouping-mode='never'
 
 [org/gnome/shell/extensions/user-theme]
 name='TanyelOS-Dark'

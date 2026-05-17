@@ -439,10 +439,10 @@
   background: linear-gradient(to bottom,
     rgba(43, 158, 168, 0.22) 0,
     rgba(43, 158, 168, 0.08) 4px,
-    rgba(27, 31, 42, 0.94) 10px,
+    rgba(27, 31, 42, 0.94) 12px,
     rgba(27, 31, 42, 0.94) 100%);
   border-top: none;
-  height: 52px;
+  height: 56px;
 }
 
 .window-list,
@@ -458,11 +458,34 @@
   border: 0.5px solid rgba(58, 63, 82, 0.5);
   border-radius: 8px;
   margin: 2px;
-  padding: 0 14px;
+  padding: 4px 14px;
   color: #F5F3EF;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
-  min-height: 36px;
+  min-height: 40px;
+  min-width: 180px;
+  spacing: 8px;
+}
+
+/* Force the label + icon inside the chip to render with our font/color.
+   Window List builds the chip as `StBoxLayout > StBin(StIcon) + StLabel`,
+   neither of which inherits `font-size`/`color` from the button on its own. */
+.window-list .window-button StLabel,
+.window-list-window-button StLabel {
+  color: #F5F3EF;
+  font-size: 14px;
+  font-weight: 500;
+  padding-left: 6px;
+}
+.window-list .window-button StIcon,
+.window-list-window-button StIcon {
+  icon-size: 20px;
+  color: #F5F3EF;
+}
+.window-list .window-button.focused StLabel,
+.window-list-window-button.focused StLabel {
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
 .window-list .window-button:hover,
