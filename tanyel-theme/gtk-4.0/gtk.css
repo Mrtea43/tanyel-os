@@ -424,8 +424,9 @@ windowcontrols button {
 }
 /* Glyph hidden by default, appears when hovering the whole group (macOS). */
 windowcontrols button image {
-  color: rgba(20, 20, 20, 0.75);
-  -gtk-icon-size: 8px;
+  color: rgba(0, 0, 0, 0.95);
+  -gtk-icon-size: 10px;
+  -gtk-icon-style: symbolic;
   opacity: 0;
   transition: opacity 150ms ease;
 }
