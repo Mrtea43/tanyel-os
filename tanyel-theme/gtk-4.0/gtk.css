@@ -413,7 +413,6 @@ windowcontrols {
 windowcontrols button {
   background: transparent;
   background-image: none;
-  -gtk-icon-source: none;
   border: none;
   box-shadow: none;
   min-width: 14px;
@@ -421,11 +420,17 @@ windowcontrols button {
   margin: 0 4px;
   padding: 0;
   border-radius: 999px;
-  color: transparent;       /* hide the X/dash/expand glyph */
+  transition: filter 150ms ease, transform 80ms ease;
 }
+/* Glyph hidden by default, appears when hovering the whole group (macOS). */
 windowcontrols button image {
+  color: rgba(20, 20, 20, 0.75);
+  -gtk-icon-size: 8px;
   opacity: 0;
-  -gtk-icon-size: 0;
+  transition: opacity 150ms ease;
+}
+windowcontrols:hover button image {
+  opacity: 1;
 }
 windowcontrols button.close {
   background: @c_close;
@@ -437,10 +442,11 @@ windowcontrols button.maximize {
   background: @c_max;
 }
 windowcontrols button:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.1);
 }
 windowcontrols button:active {
-  filter: brightness(0.85);
+  filter: brightness(0.8);
+  transform: scale(0.92);
 }
 headerbar:not(:focus-within) windowcontrols button {
   opacity: 0.45;        /* dim, but keep the colors visible */
